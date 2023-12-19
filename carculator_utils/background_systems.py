@@ -5,7 +5,7 @@ the evolution of fuel blends, sulfur content in fuels, and electricity mixes in 
 countries over time.
 """
 
-
+from pathlib import Path
 from typing import Dict, List
 
 import numpy as np
@@ -13,7 +13,7 @@ import pandas as pd
 import xarray as xr
 import yaml
 
-from . import DATA_DIR
+from carculator_utils import data as data_carculator
 
 
 def data_to_dict(csv_list: list) -> dict:
@@ -42,7 +42,7 @@ def get_electricity_losses() -> Dict[str, float]:
 
     """
     filename = "cumulative_electricity_losses.csv"
-    filepath = DATA_DIR / "electricity" / filename
+    filepath = Path(data_carculator.__file__).parent / "electricity" / filename
     if not filepath.is_file():
         raise FileNotFoundError(
             "The CSV file that contains electricity " "mixes could not be found."
@@ -66,7 +66,7 @@ def get_electricity_mix() -> xr.DataArray:
 
     """
     filename = "electricity_mixes.csv"
-    filepath = DATA_DIR / "electricity" / filename
+    filepath = Path(data_carculator.__file__).parent / "electricity" / filename
     if not filepath.is_file():
         raise FileNotFoundError(
             "The CSV file that contains " "electricity mixes could not " "be found."
@@ -122,7 +122,7 @@ def get_sulfur_content_in_fuel() -> xr.DataArray:
     :rtype: xarray.core.dataarray.DataArray
     """
     filename = "S_concentration_fuel.csv"
-    filepath = DATA_DIR / "fuel" / filename
+    filepath = Path(data_carculator.__file__).parent / "fuel" / filename
 
     if not filepath.is_file():
         raise FileNotFoundError(
@@ -149,7 +149,7 @@ def get_default_fuels() -> dict:
     """Import default fuels from `default_fuels.yaml`."""
 
     filename = "default_fuels.yaml"
-    filepath = DATA_DIR / "fuel" / filename
+    filepath = Path(data_carculator.__file__).parent / "fuel" / filename
     if not filepath.is_file():
         raise FileNotFoundError("The YAML file that contains default fuels could not be found.")
     with open(filepath, "r") as file:
@@ -163,7 +163,9 @@ def get_fuels_specs() -> dict:
 
     Contains names, LHV, CO2 emission factors.
     """
-    with open(DATA_DIR / "fuel" / "fuel_specs.yaml", "r", encoding="utf-8") as stream:
+    with open(
+        Path(data_carculator.__file__).parent / "fuel" / "fuel_specs.yaml", "r", encoding="utf-8"
+    ) as stream:
         fuel_specs = yaml.safe_load(stream)
 
     return fuel_specs
@@ -185,9 +187,15 @@ class BackgroundSystemModel:
         self.electricity_mix = get_electricity_mix()
         self.losses = get_electricity_losses()
         self.sulfur = get_sulfur_content_in_fuel()
-        self.biomethane = get_biofuel_share(DATA_DIR / "fuel" / "share_bio_cng.csv")
-        self.bioethanol = get_biofuel_share(DATA_DIR / "fuel" / "share_bio_gasoline.csv")
-        self.biodiesel = get_biofuel_share(DATA_DIR / "fuel" / "share_bio_diesel.csv")
+        self.biomethane = get_biofuel_share(
+            Path(data_carculator.__file__).parent / "fuel" / "share_bio_cng.csv"
+        )
+        self.bioethanol = get_biofuel_share(
+            Path(data_carculator.__file__).parent / "fuel" / "share_bio_gasoline.csv"
+        )
+        self.biodiesel = get_biofuel_share(
+            Path(data_carculator.__file__).parent / "fuel" / "share_bio_diesel.csv"
+        )
         self.default_fuels = get_default_fuels()
         self.fuel_specs = get_fuels_specs()
 

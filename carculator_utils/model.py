@@ -7,6 +7,8 @@ import numpy as np
 import xarray as xr
 import yaml
 
+from carculator_utils import data as data_carculator
+
 from .background_systems import BackgroundSystemModel
 from .driving_cycles import detect_vehicle_type
 from .energy_consumption import get_default_driving_cycle_name
@@ -34,7 +36,7 @@ class VehicleModel:
 
     """
 
-    DATA_DIR = Path(__file__).resolve().parent / "data"
+    DATA_DIR = Path(data_carculator.__file__).parent / "data"
 
     def __init__(
         self,

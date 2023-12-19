@@ -15,13 +15,12 @@ import xarray as xr
 import yaml
 from scipy import sparse
 
-from . import DATA_DIR
+from carculator_utils import data as data_carculator
+
 from .background_systems import BackgroundSystemModel
 from .export import ExportInventory
 
 warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
-
-IAM_FILES_DIR = DATA_DIR / "IAM"
 
 
 RANGE_PARAM = {
@@ -66,7 +65,7 @@ def get_noise_emission_flows() -> dict:
 def get_exhaust_emission_flows() -> dict:
     """Get exhaust emission flows."""
     with open(
-        DATA_DIR / "emission_factors" / "exhaust_and_noise_flows.yaml",
+        Path(data_carculator.__file__).parent / "emission_factors" / "exhaust_and_noise_flows.yaml",
         "r",
         encoding="utf-8",
     ) as stream:
@@ -95,7 +94,7 @@ def get_dict_impact_categories(method, indicator) -> dict:
     :rtype: dict
     """
     filename = "dict_impact_categories.csv"
-    filepath = DATA_DIR / "lcia" / filename
+    filepath = Path(data_carculator.__file__).parent / "lcia" / filename
     if not filepath.is_file():
         raise FileNotFoundError("The dictionary of impact categories could not be found.")
 
@@ -129,7 +128,7 @@ def get_dict_input() -> dict:
 
     """
     filename = f"dict_inputs_A_matrix.csv"
-    filepath = DATA_DIR / "IAM" / filename
+    filepath = Path(data_carculator.__file__).parent / "IAM" / filename
     if not filepath.is_file():
         raise FileNotFoundError("The dictionary of activity labels could not be found.")
 
@@ -197,7 +196,11 @@ class Inventory:
         self.add_additional_activities()
         self.rev_inputs = {v: k for k, v in self.inputs.items()}
 
-        with open(DATA_DIR / "electricity" / "elec_tech_map.yaml", "r", encoding="utf-8") as stream:
+        with open(
+            Path(data_carculator.__file__).parent / "electricity" / "elec_tech_map.yaml",
+            "r",
+            encoding="utf-8",
+        ) as stream:
             self.elec_map = yaml.safe_load(stream)
             self.elec_map = {k: tuple(v) for k, v in self.elec_map.items()}
 
@@ -280,7 +283,9 @@ class Inventory:
         """
         # read `impact_source_categories.yml` file
         with open(
-            DATA_DIR / "lcia" / "impact_source_categories.yml", "r", encoding="utf-8"
+            Path(data_carculator.__file__).parent / "lcia" / "impact_source_categories.yml",
+            "r",
+            encoding="utf-8",
         ) as stream:
             source_cats = yaml.safe_load(stream)
 
@@ -481,7 +486,9 @@ class Inventory:
                     )
                 ] = maximum
 
-        with open(DATA_DIR / "emission_factors" / "euro_classes.yaml", "r") as stream:
+        with open(
+            Path(data_carculator.__file__).parent / "emission_factors" / "euro_classes.yaml", "r"
+        ) as stream:
             euro_classes = yaml.safe_load(stream)[self.vm.vehicle_type]
 
         list_years = np.clip(
@@ -549,7 +556,7 @@ class Inventory:
         """
 
         filename = "A_matrix.csv"
-        filepath = DATA_DIR / "IAM" / filename
+        filepath = Path(data_carculator.__file__).parent / "IAM" / filename
         if not filepath.is_file():
             raise FileNotFoundError("The IAM files could not be found.")
 
@@ -586,7 +593,7 @@ class Inventory:
 
         filepaths = [
             str(fp)
-            for fp in list(Path(IAM_FILES_DIR).glob("*.csv"))
+            for fp in list((Path(data_carculator.__file__).parent / "IAM").glob("*.csv"))
             if all(x in str(fp) for x in [self.method, self.indicator, self.scenario])
         ]
 
