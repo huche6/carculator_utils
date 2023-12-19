@@ -1,4 +1,5 @@
-"""
+"""Compute auxiliary and motive energy needs.
+
 energy_consumption.py contains the class EnergyConsumption Model
 which exposes two methods:
 one for calculating the auxiliary energy needs,
@@ -24,7 +25,7 @@ MONTHLY_AVG_TEMP = "monthly_avg_temp.csv"
 
 
 def _(obj: Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray]:
-    """Add a trailing dimension to make input arrays broadcast correctly"""
+    """Add a trailing dimension to make input arrays broadcast correctly."""
     if isinstance(obj, (np.ndarray, xr.DataArray)):
         return np.expand_dims(obj, -1)
 
@@ -32,7 +33,7 @@ def _(obj: Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray]:
 
 
 def __(obj: Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray]:
-    """Add a heading dimension to make input arrays broadcast correctly"""
+    """Add a heading dimension to make input arrays broadcast correctly."""
     if isinstance(obj, (np.ndarray, xr.DataArray)):
         return np.expand_dims(obj, 0)
 
@@ -40,12 +41,12 @@ def __(obj: Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray]:
 
 
 def get_default_driving_cycle_name(vehicle_type) -> str:
-    """Get the default driving cycle name"""
+    """Get the default driving cycle name."""
     return list(get_driving_cycle_specs()["columns"][vehicle_type].keys())[0]
 
 
 def get_efficiency_coefficients(vehicle_type: str) -> [Any, None]:
-    # load yaml file to retrieve efficiency coefficients
+    """Load yaml file to retrieve efficiency coefficients."""
 
     # if file does not exist, return None
     if not (DATA_DIR / "efficiency" / f"{vehicle_type}.yaml").exists():
@@ -58,8 +59,8 @@ def get_efficiency_coefficients(vehicle_type: str) -> [Any, None]:
 
 
 def get_country_temperature(country):
-    """
-    Retrieves mothly average temperature
+    """Retrieve mothly average temperature.
+
     :type country: country for which to retrieve temperature values
     :return:
     """
@@ -83,6 +84,7 @@ def get_country_temperature(country):
 
 
 def convert_to_xr(data):
+    """Convert array to xr.xarray."""
     return xr.DataArray(
         data,
         dims=["second", "value", "year", "powertrain", "size", "parameter"],
@@ -116,9 +118,7 @@ def convert_to_xr(data):
 
 
 class EnergyConsumptionModel:
-    """
-    Calculate energy consumption of a vehicle for a
-    given driving cycle and vehicle parameters.
+    """Calculate energy consumption of a vehicle for a given driving cycle and vehicle parameters.
 
     Based on a selected driving cycle, this class calculates
     the acceleration needed and provides
@@ -217,6 +217,7 @@ class EnergyConsumptionModel:
         battery_cooling_unit,
         battery_heating_unit,
     ) -> tuple[Any, Any, Any, Any]:
+        """Compute hvac energy."""
         if self.ambient_temperature is not None:
             if isinstance(self.ambient_temperature, (float, int)):
                 self.ambient_temperature = np.resize(self.ambient_temperature, (12,))
@@ -281,9 +282,7 @@ class EnergyConsumptionModel:
         return p_cooling, p_heating, p_battery_cooling, p_battery_heating
 
     def find_last_driving_second(self) -> ndarray:
-        """
-        Find the last second of the driving cycle that is not zero.
-        """
+        """Find the last second of the driving cycle that is not zero."""
 
         # find last index where velocity is greater than 0
         # along the last axis of self.velocity
@@ -309,8 +308,7 @@ class EnergyConsumptionModel:
         cooling_consumption: Union[xr.DataArray, np.array] = None,
         heating_consumption: Union[xr.DataArray, np.array] = None,
     ) -> Union[tuple[Any, Any, Any, Any, Any], Any]:
-        """
-        Calculate energy used other than motive energy per km driven.
+        """Calculate energy used other than motive energy per km driven.
 
         :param aux_power: Total power needed for auxiliaries, heating, and cooling (W)
         :param efficiency: Efficiency of electricity generation (dimensionless, between 0.0 and 1.0).
@@ -364,7 +362,7 @@ class EnergyConsumptionModel:
         if self.efficiency_coefficients is None:
             return xr.where(efficiency == 0, 1, efficiency)
 
-        # Calculate efficiency based on engine load
+        """Calculate efficiency based on engine load."""
         pwts = {
             "ICEV-p": "gasoline",
             "ICEV-d": "diesel",
@@ -427,8 +425,7 @@ class EnergyConsumptionModel:
         cooling_consumption: Union[xr.DataArray, np.array] = None,
         heating_consumption: Union[xr.DataArray, np.array] = None,
     ) -> DataArray:
-        """
-        Calculate energy used and recuperated for a given vehicle per km driven.
+        r"""Calculate energy used and recuperated for a given vehicle per km driven.
 
         :param driving_mass: Mass of vehicle (kg)
         :param rr_coef: Rolling resistance coefficient (dimensionless, between 0.0 and 1.0)

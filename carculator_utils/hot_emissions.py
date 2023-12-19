@@ -1,4 +1,5 @@
-"""
+"""Compute fuel-related exhaust emissions.
+
 hot_emissions.py contains HotEmissionModel
 which calculates fuel-related exhaust emissions.
 """
@@ -37,15 +38,17 @@ MAP_PWT = {
 
 
 def _(obj: Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray]:
-    """Add a trailing dimension to make input arrays broadcast correctly"""
+    """Add a trailing dimension to make input arrays broadcast correctly."""
     if isinstance(obj, (np.ndarray, xr.DataArray)):
         return np.expand_dims(obj, -1)
     return obj
 
 
 def get_emission_factors(filepath) -> [Any, None]:
-    """Hot emissions factors extracted for passenger cars from HBEFA 4.1
-    detailed by size, powertrain and EURO class for each substance.
+    """Hot emissions factors extracted for passenger cars.
+
+    The emissions factors are from HBEFA 4.1 detailed by size, powertrain and EURO class
+    for each substance.
     """
 
     try:
@@ -74,7 +77,8 @@ def get_mileage_degradation_factor(
     powertrains: List[str],
     vehicle_type: str,
 ) -> [DataArray, None]:
-    """
+    """Catalyst degrade overtime.
+
     Catalyst degrade overtime, leading to increased emissions
     of CO, HC and NOX. We apply a correction factor from HBEFA 4.1
     to reflect this.
@@ -118,12 +122,14 @@ def get_mileage_degradation_factor(
 
 
 def get_driving_cycle_compartments(cycle_name, vehicle_type) -> dict:
+    """Get driving cycle compartments."""
     with open(FILEPATH_DC_SPECS, "r") as f:
         return yaml.safe_load(f)["environments"][vehicle_type][cycle_name]
 
 
 class HotEmissionsModel:
-    """
+    """Compute hot pullutants emissions.
+
     Calculate hot pollutants emissions based on HBEFA 4.1 data, function of fuel consumption
     for vehicles with a combustion engine.
 
@@ -167,7 +173,8 @@ class HotEmissionsModel:
         energy_consumption: xr.DataArray,
         yearly_km: xr.DataArray,
     ) -> DataArray:
-        """
+        """Compute hot pollutants emissions.
+
         Calculate hot pollutants emissions given a powertrain type (i.e., diesel, petrol, CNG)
         and a EURO pollution class, per air sub-compartment (i.e., urban, suburban and rural).
         Note that Nh3 and N2O emissions do not depend on the speed level. For those, average

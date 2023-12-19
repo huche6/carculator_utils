@@ -1,4 +1,5 @@
-"""
+"""All methods to solve inventories.
+
 inventory.py contains InventoryCalculation which provides all methods to solve inventories.
 """
 
@@ -63,6 +64,7 @@ def get_noise_emission_flows() -> dict:
 
 
 def get_exhaust_emission_flows() -> dict:
+    """Get exhaust emission flows."""
     with open(
         DATA_DIR / "emission_factors" / "exhaust_and_noise_flows.yaml",
         "r",
@@ -84,7 +86,8 @@ def get_exhaust_emission_flows() -> dict:
 
 
 def get_dict_impact_categories(method, indicator) -> dict:
-    """
+    """Load a dictionary with available impact assessment methods, level and categories.
+
     Load a dictionary with available impact assessment
     methods as keys, and assessment level and categories as values.
 
@@ -115,7 +118,8 @@ def get_dict_impact_categories(method, indicator) -> dict:
 
 
 def get_dict_input() -> dict:
-    """
+    """Load a dictionary of inputs as tuple.
+
     Load a dictionary with tuple ("name of activity", "location", "unit",
     "reference product") as key, row/column
     indices as values.
@@ -141,8 +145,7 @@ def get_dict_input() -> dict:
 
 
 class Inventory:
-    """
-    Build and solve the inventory for results characterization and inventory export
+    """Build and solve the inventory for results characterization and inventory export.
 
     :ivar vm: object from the VehicleModel class
     :ivar background_configuration: dictionary that contains choices for background system
@@ -226,8 +229,7 @@ class Inventory:
         self.remove_uncompliant_vehicles()
 
     def get_results_table(self, sensitivity: bool = False) -> xr.DataArray:
-        """
-        Format a xarray.DataArray array to receive the results.
+        """Format a xarray.DataArray array to receive the results.
 
         :param sensitivity: if True, the results table will
         be formatted to receive sensitivity analysis results
@@ -271,8 +273,7 @@ class Inventory:
         return response
 
     def get_split_indices(self):
-        """
-        Return list of indices to split the results into categories.
+        """Return list of indices to split the results into categories.
 
         :return: list of indices
         :rtype: list
@@ -315,6 +316,7 @@ class Inventory:
         return list(idx_cats.keys()), list_ind
 
     def get_load_factor(self):
+        """Get load factor."""
         # If the FU is in passenger-km, we normalize the results by
         # the number of passengers
         if self.func_unit == "vkm":
@@ -348,6 +350,7 @@ class Inventory:
         return load_factor
 
     def calculate_impacts(self, sensitivity=False):
+        """Compute impact of a scenario."""
         if self.scenario != "static":
             B = self.B.interp(year=self.scope["year"], kwargs={"fill_value": "extrapolate"}).values
         else:
@@ -441,6 +444,7 @@ class Inventory:
         return results / self.get_load_factor()
 
     def add_additional_activities(self):
+        """Add activities."""
         # Add as many rows and columns as cars to consider
         # Also add additional columns and rows for electricity markets
         # for fuel preparation and energy battery production
@@ -533,8 +537,9 @@ class Inventory:
                     ] = maximum
 
     def get_A_matrix(self):
-        """
-        Load the A matrix. The matrix contains exchanges of products (rows)
+        """Load the A matrix.
+
+        The matrix contains exchanges of products (rows)
         between activities (columns).
 
         :return: A matrix with three dimensions of shape (number of values,
@@ -564,8 +569,9 @@ class Inventory:
         return new_A
 
     def get_B_matrix(self) -> xr.DataArray:
-        """
-        Load the B matrix. The B matrix contains impact assessment
+        """Load the B matrix.
+
+        The B matrix contains impact assessment
         figures for a give impact assessment method,
         per unit of activity. Its length column-wise equals
         the length of the A matrix row-wise.
@@ -613,7 +619,8 @@ class Inventory:
     def get_index_vehicle_from_array(
         self, items_to_look_for, items_to_look_for_also=[], method="or"
     ):
-        """
+        """Get indexes of vehicles.
+
         Return list of row/column indices of self.vm.array of labels
         that contain the string defined in `items_to_look_for`.
 
@@ -642,7 +649,8 @@ class Inventory:
         )
 
     def get_index_of_flows(self, items_to_look_for, search_by="name"):
-        """
+        """Get indexes of flows.
+
         Return list of row/column indices of self.A of labels that contain the string defined in `items_to_look_for`.
 
         :param items_to_look_for: string
@@ -664,7 +672,8 @@ class Inventory:
             ]
 
     def define_electricity_mix_for_fuel_prep(self) -> np.ndarray:
-        """
+        """Define a fuel mix based on user-defined mix.
+
         This function defines a fuel mix based either on user-defined mix,
         or on default mixes for a given country.
         The mix is calculated as the average mix, weighted by the
@@ -739,10 +748,7 @@ class Inventory:
         return np.clip(mix, 0, 1) / np.clip(mix, 0, 1).sum(axis=1)[:, None]
 
     def define_renewable_rate_in_mix(self) -> list:
-        """
-        This function returns the renewable rate in the electricity mix
-        for each year.
-        """
+        """Return the renewable rate in the electricity mix for each year."""
 
         sum_renew = [
             np.sum([mix[i] for i in [0, 3, 4, 5, 8, 9, 10, 11, 14, 15, 18, 19]]) for mix in self.mix
@@ -752,7 +758,8 @@ class Inventory:
 
     # @lru_cache
     def find_input_indices(self, contains: [tuple, str], excludes: tuple = ()) -> list:
-        """
+        """Find the indices of the inputs in the A matrix.
+
         This function finds the indices of the inputs in the A matrix
         that contain the strings in the contains list, and do not
         contain the strings in the excludes list.
@@ -777,8 +784,8 @@ class Inventory:
         return indices
 
     def add_electricity_infrastructure(self, dataset, losses):
+        """Add transmission network for high and medium voltage."""
         for y, year in enumerate(self.scope["year"]):
-            # Add transmission network for high and medium voltage
             for input in [
                 (
                     "transmission network construction, electricity, high voltage",
@@ -818,7 +825,8 @@ class Inventory:
                 ] = input[2]
 
     def create_electricity_mix_for_fuel_prep(self):
-        """
+        """Electricity market.
+
         This function fills the electricity market that
         supplies battery charging operations
         and hydrogen production through electrolysis.
@@ -849,9 +857,9 @@ class Inventory:
         )
 
     def create_electricity_market_for_battery_production(self):
-        """
-        This function fills in the column in `self.A` concerned
-        with the electricity mix used for manufacturing battery cells
+        """Fill in the column in `self.A`.
+
+        It is concerned with the electricity mix used for manufacturing battery cells
         :return:
         """
 
@@ -904,8 +912,8 @@ class Inventory:
         )
 
     def get_sulfur_content(self, location, fuel, year):
-        """
-        Return the sulfur content in the fuel.
+        """Return the sulfur content in the fuel.
+
         If a region is passed, the average sulfur content over
         the countries the region contains is returned.
 
@@ -945,10 +953,7 @@ class Inventory:
         return sulfur_concentration
 
     def learning_rate_fuel(self, fuel, year, share, val):
-        """
-        This function calculates the learning rate for hydrogen
-        production by electrolysis.
-        """
+        """Compute the learning rate for hydrogen production by electrolysis."""
 
         amount_h2 = {
             "electrolysis": 1,
@@ -966,10 +971,9 @@ class Inventory:
         return electricity
 
     def create_fuel_markets(self):
-        """
-        This function creates markets for fuel, considering a given blend,
-        a given fuel type and a given year.
-        It also adds separate electricity input in case hydrogen
+        """Create markets for fuel, considering a given blend, a given fuel type and a given year.
+
+        It adds separate electricity input in case hydrogen
         from electrolysis is needed somewhere in the fuel supply chain.
         :return:
         """
@@ -1059,8 +1063,8 @@ class Inventory:
         zero_out_input=False,
         filter_activities=None,
     ):
-        """
-        Finds the exchange inputs to a specified functional unit
+        """Find the exchange inputs to a specified functional unit.
+
         :param zero_out_input:
         :param find_input_by: can be 'name' or 'unit'
         :param value_in: value to look for
@@ -1112,8 +1116,8 @@ class Inventory:
         return sum_supplied
 
     def get_fuel_blend_carbon_intensity(self, fuel_type: str) -> [np.ndarray, np.ndarray]:
-        """
-        Returns the carbon intensity of a fuel blend.
+        """Return the carbon intensity of a fuel blend.
+
         :param fuel_type: fuel type
         :return: carbon intensity of fuel blend fossil, and biogenic
         """
@@ -1134,8 +1138,8 @@ class Inventory:
         )
 
     def fill_in_A_matrix(self):
-        """
-        Fill-in the A matrix. Does not return anything. Modifies in place.
+        """Fill-in the A matrix. Does not return anything. Modifies in place.
+
         Shape of the A matrix (values, products, activities).
 
         :param array: :attr:`array` from :class:`CarModel` class
@@ -1172,6 +1176,7 @@ class Inventory:
         )
 
     def add_hydrogen_tank(self):
+        """Add hydrogen tank."""
         hydro_tank_type = self.vm.energy_storage.get("hydrogen", {"tank type": "carbon fiber"})[
             "tank type"
         ]
@@ -1193,6 +1198,7 @@ class Inventory:
         )
 
     def add_battery(self):
+        """Add battery."""
         # Start of printout
         print(
             "****************** IMPORTANT BACKGROUND PARAMETERS ******************",
@@ -1284,6 +1290,7 @@ class Inventory:
         )
 
     def add_cng_tank(self):
+        """Add cng tank."""
         index = self.get_index_vehicle_from_array("ICEV-g")
         self.A[
             :,
@@ -1294,6 +1301,7 @@ class Inventory:
         )
 
     def add_vehicle_to_transport_dataset(self):
+        """Add vehicle to transport dataset."""
         self.A[
             :,
             self.find_input_indices((f"{self.vm.vehicle_type.capitalize()}, ",)),
@@ -1303,6 +1311,7 @@ class Inventory:
         )
 
     def display_renewable_rate_in_mix(self):
+        """Display renewable rate in mix."""
         sum_renew = self.define_renewable_rate_in_mix()
 
         use_year = (
@@ -1331,6 +1340,7 @@ class Inventory:
             )
 
     def add_electricity_to_electric_vehicles(self) -> None:
+        """Add electricity to electric vehicles."""
         electric_powertrains = [
             "BEV",
             "BEV-opp",
@@ -1365,6 +1375,7 @@ class Inventory:
                 ]
 
     def add_hydrogen_to_fuel_cell_vehicles(self) -> None:
+        """Add hydrogen to fuel cell vehicles."""
         if "FCEV" in self.scope["powertrain"]:
             index = self.get_index_vehicle_from_array("FCEV")
 
@@ -1404,6 +1415,7 @@ class Inventory:
                 )
 
     def display_fuel_blend(self, fuel) -> None:
+        """Display fuel blend."""
         print(
             "{} is completed by {}.".format(
                 self.vm.fuel_blend[fuel]["primary"]["type"],
@@ -1426,6 +1438,7 @@ class Inventory:
     def add_carbon_dioxide_emissions(
         self, year, powertrain, powertrain_short, fossil_co2, biogenic_co2
     ) -> None:
+        """Add carbon dioxide emissions."""
         ind_array = [
             x
             for x in self.get_index_vehicle_from_array(year)
@@ -1462,8 +1475,10 @@ class Inventory:
         )
 
     def add_sulphur_emissions(self, year, fuel, powertrain_short, powertrains) -> None:
-        # Fuel-based SO2 emissions
-        # Sulfur concentration value for a given country, a given year, as concentration ratio
+        """Fuel-based SO2 emissions.
+
+        Sulfur concentration value for a given country, a given year, as concentration ratio.
+        """
 
         sulfur_concentration = self.get_sulfur_content(self.vm.country, fuel, year)
         index = self.get_index_vehicle_from_array(powertrains, [year], method="and")
@@ -1484,6 +1499,7 @@ class Inventory:
             )
 
     def add_fuel_to_vehicles(self, fuel, powertrains, powertrains_short) -> None:
+        """Add fuel to vehicles."""
         if [i for i in self.scope["powertrain"] if i in powertrains]:
             index = self.get_index_vehicle_from_array(powertrains)
             (
@@ -1526,7 +1542,7 @@ class Inventory:
                 self.add_sulphur_emissions(year, fuel, [powertrains_short], powertrains)
 
     def add_road_maintenance(self) -> None:
-        # Infrastructure maintenance
+        """Infrastructure maintenance."""
         self.A[
             :,
             self.find_input_indices(("market for road maintenance",)),
@@ -1536,7 +1552,7 @@ class Inventory:
         )
 
     def add_road_construction(self) -> None:
-        # Infrastructure
+        """Infrastructure."""
         self.A[
             :,
             self.find_input_indices(
@@ -1548,8 +1564,10 @@ class Inventory:
         )
 
     def add_exhaust_emissions(self) -> None:
-        # Exhaust emissions
-        # Non-fuel based emissions
+        """Exhaust emissions.
+
+        Non-fuel based emissions.
+        """
         self.A[
             np.ix_(
                 np.arange(self.iterations),
@@ -1563,7 +1581,7 @@ class Inventory:
         )
 
     def add_noise_emissions(self) -> None:
-        # Noise emissions
+        """Noise emissions."""
         self.A[
             np.ix_(
                 np.arange(self.iterations),
@@ -1577,11 +1595,13 @@ class Inventory:
         )
 
     def add_refrigerant_emissions(self) -> None:
-        # Emissions of air conditioner refrigerant r134a
-        # Leakage assumed to amount to 53g according to
-        # https://treeze.ch/fileadmin/user_upload/downloads/Publications/Case_Studies/Mobility/544-LCI-Road-NonRoad-Transport-Services-v2.0.pdf
-        # but only to cars with an AC system (meaning, with a cooling energy consumption)
-        # and only for vehicles before 2022
+        """Emissions of air conditioner refrigerant r134a.
+
+        Leakage assumed to amount to 53g according to
+        https://treeze.ch/fileadmin/user_upload/downloads/Publications/Case_Studies/Mobility/544-LCI-Road-NonRoad-Transport-Services-v2.0.pdf
+        but only to cars with an AC system (meaning, with a cooling energy consumption)
+        and only for vehicles before 2022
+        """
 
         loss_rate = {
             "car": 0.75,
@@ -1632,7 +1652,7 @@ class Inventory:
             ).T
 
     def add_abrasion_emissions(self) -> None:
-        # Non-exhaust emissions
+        """Non-exhaust emissions."""
 
         abrasion_datasets = {
             (
@@ -1687,9 +1707,7 @@ class Inventory:
         )
 
     def is_the_vehicle_compliant(self, index):
-        """
-        Checks if the vehicle has a positive `TtW energy` value
-        """
+        """Check if the vehicle has a positive `TtW energy` value."""
 
         name = self.rev_inputs[index][0]
 
@@ -1717,9 +1735,8 @@ class Inventory:
         return True
 
     def remove_uncompliant_vehicles(self):
-        """
-        Remove vehicles from self.A that do not have a TtW energy superior to 0.
-        """
+        """Remove vehicles from self.A that do not have a TtW energy superior to 0."""
+
         # Get the indices of the vehicles that are not compliant
         idx = self.find_input_indices((self.vm.vehicle_type,))
         idx.extend(
@@ -1735,6 +1752,8 @@ class Inventory:
         self.A[:, idx, idx] = 1
 
     def change_functional_unit(self) -> None:
+        """Change functional unit."""
+
         load_factor = self.get_load_factor()
         idx_cars = self.find_input_indices((f"transport, {self.vm.vehicle_type}, ",))
         idx_others = [i for i in range(self.A.shape[1]) if i not in idx_cars]
@@ -1767,8 +1786,9 @@ class Inventory:
         software="brightway2",
         format="bw2io",
     ):
-        """
-        Export the inventory. Can export to Simapro (as csv), or brightway2 (as bw2io object, file or string).
+        """Export the inventory.
+
+        Can export to Simapro (as csv), or brightway2 (as bw2io object, file or string).
         :param db_name:
         :param ecoinvent_version: str. "3.5", "3.6", "3.7", "3.8" or "3.9"
         :param filename: str. Name of the file to be exported
