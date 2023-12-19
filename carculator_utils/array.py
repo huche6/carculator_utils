@@ -11,7 +11,6 @@ from .vehicle_input_parameters import VehicleInputParameters as vip
 def fill_xarray_from_input_parameters(input_parameters, sensitivity=False, scope=None):
     """Create an `xarray` labeled array from the sampled input parameters.
 
-
     This function extracts the parameters' names and values contained in the
     `parameters` attribute of the :class:`CarInputParameters` class
     in :mod:`car_input_parameters` and insert them into a

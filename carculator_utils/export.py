@@ -1,4 +1,5 @@
-"""
+"""Methods to export the inventories.
+
 export.py contains the class Export, which offers methods to export the inventories
 in different formats.
 """
@@ -24,10 +25,7 @@ from . import DATA_DIR, __version__
 def load_mapping(
     filename,
 ) -> Dict[Tuple[str, str, str, str], Tuple[str, str, str, str]]:
-    """
-    Load mapping dictionary between
-    two versions of ecoinvent.
-    """
+    """Load mapping dictionary between two versions of ecoinvent."""
 
     # Load the matching dictionary
     filepath = DATA_DIR / "export" / filename
@@ -91,8 +89,10 @@ def load_mapping(
 
 
 def get_simapro_subcompartments() -> Dict[str, str]:
-    # Load the matching dictionary between ecoinvent and Simapro subcompartments
-    # contained in simapro_subcompartments.yaml
+    """Load the matching dictionary between ecoinvent and Simapro subcompartments.
+
+    It is contained in simapro_subcompartments.yaml.
+    """
 
     filename = "simapro_subcompartments.yaml"
     filepath = DATA_DIR / "export" / filename
@@ -113,7 +113,7 @@ def get_simapro_subcompartments() -> Dict[str, str]:
 
 
 def load_references() -> Dict[str, Dict[str, str]]:
-    """Load a dictionary with references/sources of datasets"""
+    """Load a dictionary with references/sources of datasets."""
 
     # Load the matching dictionary
     filename = "references.csv"
@@ -139,8 +139,10 @@ def load_references() -> Dict[str, Dict[str, str]]:
 
 
 def get_simapro_biosphere() -> Dict[str, str]:
-    # Load the matching dictionary between ecoinvent and Simapro biosphere flows
-    # for each ecoinvent biosphere flow name, it gives the corresponding Simapro name
+    """Load the matching dictionary between ecoinvent and Simapro biosphere flows.
+
+    For each ecoinvent biosphere flow name, it gives the corresponding Simapro name.
+    """
 
     filename = "simapro-biosphere.json"
     filepath = DATA_DIR / "export" / filename
@@ -159,7 +161,7 @@ def get_simapro_biosphere() -> Dict[str, str]:
 
 
 def get_simapro_technosphere() -> Dict[Tuple[str, str], str]:
-    # Load the matching dictionary between ecoinvent and Simapro product flows
+    """Load the matching dictionary between ecoinvent and Simapro product flows."""
 
     filename = "simapro-technosphere-3.5.csv"
     filepath = DATA_DIR / "export" / filename
@@ -177,9 +179,7 @@ def get_simapro_technosphere() -> Dict[Tuple[str, str], str]:
 
 
 def rename_mapping(filename: str) -> Dict[str, str]:
-    """
-    Load the file rename_powertrains.yml and return a dictionary
-    """
+    """Load the file rename_powertrains.yml and return a dictionary."""
     with open(DATA_DIR / "export" / filename, encoding="utf-8") as f:
         rename_map = yaml.safe_load(f)
 
@@ -187,10 +187,7 @@ def rename_mapping(filename: str) -> Dict[str, str]:
 
 
 class ExportInventory:
-    """
-    Export the inventory to various formats
-
-    """
+    """Export the inventory to various formats."""
 
     def __init__(self, array, vehicle_model, indices, db_name="carculator_utils export"):
         self.array: xr.DataArray = array
@@ -212,10 +209,7 @@ class ExportInventory:
         }
 
     def rename_vehicles(self) -> None:
-        """
-        Rename powertrain acronyms to full length descriptive terms
-
-        """
+        """Rename powertrain acronyms to full length descriptive terms."""
 
         for k, value in self.indices.items():
             for key, val in self.rename_pwt.items():
@@ -230,8 +224,8 @@ class ExportInventory:
         self,
         ecoinvent_version: str,
     ) -> List[Dict]:
-        """
-        Return the inventory as a dictionary
+        """Return the inventory as a dictionary.
+
         If there are several values for one exchange, uncertainty information is generated.
         If `presamples` is True, returns the inventory as well as a `presamples` matrix.
         If `presamples` is False, returns the inventory with characterized uncertainty information.
@@ -495,8 +489,10 @@ class ExportInventory:
         return rows
 
     def format_data_for_lci_for_simapro(self, data: List[Dict], ei_version: str) -> List[List]:
-        # not all biosphere flows exist in simapro
-        # load list from `simapro_blacklist.yml`
+        """Load list from `simapro_blacklist.yml`.
+
+        Not all biosphere flows exist in simapro.
+        """
         with open(DATA_DIR / "export" / "simapro_blacklist.yml", "r", encoding="utf-8") as f:
             blacklist = yaml.safe_load(f)
 
@@ -1003,7 +999,7 @@ class ExportInventory:
         return rows
 
     def get_export_filepath(self, filename, directory=None):
-        # check that filepath exists
+        """Check that filepath exists."""
         directory = directory or os.getcwd()
         if not os.path.exists(directory):
             os.makedirs(directory)
@@ -1017,6 +1013,7 @@ class ExportInventory:
         filename: str = None,
         export_format: str = "file",
     ):
+        """Write simapro lci."""
         filename = filename or safe_filename(f"carculator_export_{datetime.date.today()}")
 
         filename += "_simapro.csv"
@@ -1058,9 +1055,8 @@ class ExportInventory:
         filename: str = None,
         export_format: str = "file",
     ) -> Union[bytes, str, bw2io.importers.base_lci.LCIImporter]:
-        """
-        Export a file that can be consumed by the software defined in
-        `software_compatibility`.
+        """Export a file that can be consumed by the software defined in `software_compatibility`.
+
         Alternatively, exports a string representation of the file
         (in case the invenotry should be downloaded
         from a browser, for example)

@@ -1,12 +1,10 @@
-"""
-driving_cycles.py loads a driving cycle based on
-the name specific by the user.
+"""Load a driving cycle based on the name specified by the user.
+
 The driving cycle returned is a numpy
 array with speed levels (in km/h) for each
 second of driving.
 """
 
-import sys
 from pathlib import Path
 from typing import List, Tuple
 
@@ -19,9 +17,7 @@ FILEPATH_DC_SPECS = DATA_DIR / "driving cycle" / "dc_specs.yaml"
 
 
 def detect_vehicle_type(vehicle_sizes: List[str]) -> str:
-    """
-    Detect the type of vehicle based on the size of the vehicle.
-    """
+    """Detect the type of vehicle based on the size of the vehicle."""
 
     dc = get_driving_cycle_specs()
 
@@ -47,8 +43,8 @@ def get_driving_cycle_specs() -> dict:
 
 
 def get_dc_column_number(vehicle_type: str, vehicle_size: List[str], dc_name: str) -> List[int]:
-    """
-    Loads YAML file that contains the column number.
+    """Load YAML file that contains the column number.
+
     Return the column number given a vehicle type and driving cycle name.
     """
 
@@ -79,6 +75,8 @@ def get_dc_column_number(vehicle_type: str, vehicle_size: List[str], dc_name: st
 
 
 def get_data(filepath: Path, vehicle_type: str, vehicle_sizes: List[str], name: str) -> np.ndarray:
+    """Get data of a specified cycle."""
+
     try:
         col = get_dc_column_number(vehicle_type, vehicle_sizes, name)
         arr = np.genfromtxt(filepath, delimiter=";")

@@ -5,6 +5,7 @@ from klausen import NamedParameters
 
 
 def load_parameters(obj):
+    """Load parameters."""
     if isinstance(obj, (str, Path)):
         assert Path(obj).exists(), f"Can't find this filepath {obj}."
         return json.load(open(obj))
@@ -14,9 +15,7 @@ def load_parameters(obj):
 
 
 class VehicleInputParameters(NamedParameters):
-    """
-    A class used to represent vehicles with associated type, size,
-    technology, year and parameters.
+    """Represent vehicles with associated type, size, technology, year and parameters.
 
     This class inherits from NamedParameters, located in the *klausen* package.
     It sources default parameters for all vehicle types from a dictionary in
@@ -79,8 +78,7 @@ class VehicleInputParameters(NamedParameters):
         self.add_vehicle_parameters(parameters)
 
     def add_vehicle_parameters(self, parameters):
-        """
-        Split data and metadata according to ``klausen`` convention.
+        """Split data and metadata according to ``klausen`` convention.
 
         The parameters are split into the *metadata* and *values* attributes
         of the CarInputParameters class by the add_parameters() method of the parent class.

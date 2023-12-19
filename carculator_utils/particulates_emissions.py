@@ -1,4 +1,5 @@
-"""
+"""Compute the amount of abrasion particles emitted.
+
 particulates_emissions.py contains ParticulatesEmissionsModel which calculated the amount of
 abrasion particles emitted, given a driving cycle.
 """
@@ -11,15 +12,16 @@ from .hot_emissions import get_driving_cycle_compartments
 
 
 def _(obj: Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray]:
-    """Add a trailing dimension to make input arrays broadcast correctly"""
+    """Add a trailing dimension to make input arrays broadcast correctly."""
     if isinstance(obj, (np.ndarray, xr.DataArray)):
         return np.expand_dims(obj, -1)
     return obj
 
 
 class ParticulatesEmissionsModel:
-    """
-    Calculate particulates emissions based on the method described in:
+    """Calculate particulates emissions.
+
+    The calculation is based on the method described in:
     https://www.eea.europa.eu/ds_resolveuid/6USNA27I4D
 
     and further disaggregated in:
@@ -112,8 +114,7 @@ class ParticulatesEmissionsModel:
         return res.transpose(0, 1, 4, 2, 3)
 
     def get_tire_wear_emissions(self):
-        """
-        Returns tire wear emissions.
+        """Compute tire wear emissions.
 
         :return:
         """
@@ -138,8 +139,7 @@ class ParticulatesEmissionsModel:
         )
 
     def get_brake_wear_emissions(self):
-        """
-        Returns brake wear emissions.
+        """Compute brake wear emissions.
 
         :return:
         """
@@ -163,8 +163,7 @@ class ParticulatesEmissionsModel:
         )
 
     def get_road_wear_emissions(self):
-        """
-        Returns road wear emissions.
+        """Compute road wear emissions.
 
         :return:
         """
@@ -175,8 +174,7 @@ class ParticulatesEmissionsModel:
         return (pm10, pm25)
 
     def get_resuspended_road_dust(self):
-        """
-        Returns re-suspended road dust emissions.
+        """Compute re-suspended road dust emissions.
 
         :return:
         """

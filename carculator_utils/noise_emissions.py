@@ -1,4 +1,5 @@
-"""
+"""Compute noise emissions.
+
 noise_emissions.py contains NoiseEmissionsModel which calculates noise emissions, in joules,
 given a driving cycle and a powertrain type.
 """
@@ -57,14 +58,16 @@ MAP_SIZES = {
 
 
 def _(obj: Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray]:
-    """Add a trailing dimension to make input arrays broadcast correctly"""
+    """Add a trailing dimension to make input arrays broadcast correctly."""
     if isinstance(obj, (np.ndarray, xr.DataArray)):
         return np.expand_dims(obj, -1)
     return obj
 
 
 def get_noise_coefficients(filepath: Path) -> Union[None, xr.DataArray]:
-    """Noise coefficients extracted for vehicles from CNOSSOS-EU 2018
+    """Noise coefficients.
+
+    They are extracted for vehicles from CNOSSOS-EU 2018
     detailed by size, powertrain and EURO class for each octave.
 
     :param filepath: Path to the noise coefficients file.
@@ -92,7 +95,8 @@ def get_noise_coefficients(filepath: Path) -> Union[None, xr.DataArray]:
 
 
 class NoiseEmissionsModel:
-    """
+    """Compute propulsion and rolling noise.
+
     Calculate propulsion and rolling noise emissions for combustion, hybrid and electric vehicles,
     based on CNOSSOS model.
 
@@ -122,6 +126,7 @@ class NoiseEmissionsModel:
 
     def rolling_noise(self) -> np.ndarray:
         """Calculate noise from rolling friction.
+
         Model from CNOSSOS-EU project
         (http://publications.jrc.ec.europa.eu/repository/bitstream/JRC72550/cnossos-eu%20jrc%20reference%20report_final_on%20line%20version_10%20august%202012.pdf)
 
@@ -162,6 +167,7 @@ class NoiseEmissionsModel:
 
     def propulsion_noise(self) -> np.ndarray:
         """Calculate noise from propulsion engine and gearbox.
+
         Model from CNOSSOS-EU project
         (http://publications.jrc.ec.europa.eu/repository/bitstream/JRC72550/cnossos-eu%20jrc%20reference%20report_final_on%20line%20version_10%20august%202012.pdf)
 
@@ -225,7 +231,8 @@ class NoiseEmissionsModel:
         return array
 
     def get_sound_power_per_compartment(self) -> np.ndarray:
-        """
+        """Compute sound energy from sound power.
+
         Calculate sound energy (in J/s) over the driving cycle duration from
         sound power (in dB). The sound energy sums are further divided into
         `geographical compartments`: urban, suburban and rural,

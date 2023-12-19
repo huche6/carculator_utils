@@ -1,4 +1,5 @@
-"""
+"""Evolution of fuel blends, sulfur content in fuels, and electricity mixes in different countries.
+
 background_systems.py contains BackgroundSystem, which contains different arrays relating to
 the evolution of fuel blends, sulfur content in fuels, and electricity mixes in different
 countries over time.
@@ -16,8 +17,8 @@ from . import DATA_DIR
 
 
 def data_to_dict(csv_list: list) -> dict:
-    """
-    Returns a dictionary from a sequence of items.
+    """Get a dictionnary from a sequence of items.
+
     :param csv_list: list
     :return: dict
     """
@@ -32,8 +33,8 @@ def data_to_dict(csv_list: list) -> dict:
 
 
 def get_electricity_losses() -> Dict[str, float]:
-    """
-    Retrieve cumulative electricity losses from high to medium and low voltage.
+    """Retrieve cumulative electricity losses from high to medium and low voltage.
+
     Source: `ecoinvent v.3.6 <https://www.ecoinvent.org/>`_.
 
     :returns: dictionary
@@ -53,8 +54,8 @@ def get_electricity_losses() -> Dict[str, float]:
 
 
 def get_electricity_mix() -> xr.DataArray:
-    """
-    Retrieve electricity mixes and shape them into a xarray.
+    """Retrieve electricity mixes and shape them into a xarray.
+
     Source:
         * for European countries (`ENTSOE TYNDP 2020 scenarios <https://2020.entsos-tyndp-scenarios.eu/>`_),
         * for African countries (`TEMBA <http://www.osemosys.org/temba.html>`_ model)
@@ -87,7 +88,8 @@ def get_electricity_mix() -> xr.DataArray:
 
 
 def get_biofuel_share(filepath) -> xr.DataArray:
-    """
+    """Get biofuel share.
+
     :return: Returns a xarray with share of biodiesel
     in the fuel blend, per country, per year.
     """
@@ -101,8 +103,8 @@ def get_biofuel_share(filepath) -> xr.DataArray:
 
 
 def get_sulfur_content_in_fuel() -> xr.DataArray:
-    """
-    Retrieve sulfur content per kg of petrol and diesel.
+    """Retrieve sulfur content per kg of petrol and diesel.
+
     For CH, DE, FR, AU and SE, the concentration values come
     from HBEFA 4.1, from 1909 to 2020 (extrapolated to 2050).
 
@@ -144,9 +146,8 @@ def get_sulfur_content_in_fuel() -> xr.DataArray:
 
 
 def get_default_fuels() -> dict:
-    """
-    Import default fuels from `default_fuels.yaml`
-    """
+    """Import default fuels from `default_fuels.yaml`."""
+
     filename = "default_fuels.yaml"
     filepath = DATA_DIR / "fuel" / filename
     if not filepath.is_file():
@@ -158,8 +159,8 @@ def get_default_fuels() -> dict:
 
 
 def get_fuels_specs() -> dict:
-    """
-    Import fuel specifications from `fuel_specs.yaml`
+    """Import fuel specifications from `fuel_specs.yaml`.
+
     Contains names, LHV, CO2 emission factors.
     """
     with open(DATA_DIR / "fuel" / "fuel_specs.yaml", "r", encoding="utf-8") as stream:
@@ -169,7 +170,8 @@ def get_fuels_specs() -> dict:
 
 
 class BackgroundSystemModel:
-    """
+    """Dictionnaries that contain information to model in the background system.
+
     Retrieve and build dictionaries that contain important information to model in the background system:
 
         * gross electricity production mixes from nearly all countries in the world, from 2015 to 2050.
@@ -190,10 +192,12 @@ class BackgroundSystemModel:
         self.fuel_specs = get_fuels_specs()
 
     def __str__(self):
+        """Name of the class."""
         return self.__class__.__name__
 
     def get_share_biofuel(self, fuel: str, country: str, years: List[int]) -> np.array:
-        """
+        """Average share of biodiesel.
+
         Returns average share of biodiesel according to historical IEA stats
         with an upper limit of 30% when extrapolating.
         """
@@ -222,7 +226,8 @@ class BackgroundSystemModel:
     def find_fuel_shares(
         self, fuel_blend: dict, fuel_type: str, country: str, years: List[int]
     ) -> [str, str, np.array, np.array]:
-        """
+        """Fuel shares of the fuel blend.
+
         Find the fuel shares of the fuel blend, given a country, a fuel type and a list of years.
         """
         if fuel_type in fuel_blend:
@@ -274,7 +279,8 @@ class BackgroundSystemModel:
         return primary, secondary, primary_share, secondary_share
 
     def define_fuel_blends(self, powertrains: List[str], country: str, years: List[int]) -> dict:
-        """
+        """Define fuel blends.
+
         This function defines fuel blends from what is passed in `fuel_blend`.
         It populates a dictionary `self.fuel_blends` that contains the
         respective shares, lower heating values

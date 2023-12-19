@@ -1,4 +1,6 @@
-"""
+"""Carculator_utils init file.
+
+List of all submodules.
 
 Submodules
 ==========

@@ -16,12 +16,13 @@ from .particulates_emissions import ParticulatesEmissionsModel
 
 
 def finite(array, mask_value=0):
+    """Find finite values in array."""
     return np.where(np.isfinite(array), array, mask_value)
 
 
 class VehicleModel:
+    """Fleet of vehicles.
 
-    """
     This class represents the entirety of the vehicles considered,
     with useful attributes, such as an array that stores
     all the vehicles parameters.
@@ -57,7 +58,8 @@ class VehicleModel:
         ambient_temperature: float = None,
         indoor_temperature: float = 20,
     ) -> None:
-        """
+        """Initialize of VehicleModel.
+
         :param array: multi-dimensional numpy-like array that contains parameters' value(s)
         :param country: country code
         :param cycle: name of a driving cycle, or custom driving cycle
@@ -116,7 +118,8 @@ class VehicleModel:
         self.indoor_temperature = indoor_temperature
 
     def __call__(self, key: Union[str, List]):
-        """
+        """Fix a dimension of the `array` attribute.
+
         This method fixes a dimension of the `array` attribute given
         a powertrain technology selected.
         Set up this class as a context manager,
@@ -142,14 +145,17 @@ class VehicleModel:
         return self
 
     def __enter__(self):
+        """Enter."""
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        """Exit."""
         self.array = self.__cache
         del self.__cache
 
     def __getitem__(self, key: Union[str, List]) -> xr.DataArray:
-        """
+        """Automatic filter.
+
         Make class['foo'] automatically filter for the parameter 'foo'
         Makes the model code much cleaner
 
@@ -160,15 +166,19 @@ class VehicleModel:
         return self.array.loc[dict(parameter=key)]
 
     def __setitem__(self, key, value):
+        """Set item."""
         self.array.loc[{"parameter": key}] = value
 
     def set_all(self):
+        """Set all."""
         pass
 
     def set_battery_chemistry(self):
+        """Set battery chemistry."""
         pass
 
     def set_battery_preferences(self):
+        """Set battery preferences."""
         l_parameters = [
             p
             for p in [
@@ -207,7 +217,8 @@ class VehicleModel:
                 ] = cell_params.values
 
     def adjust_cost(self) -> None:
-        """
+        """Compute energy storage over time.
+
         This method adjusts costs of energy storage over time, to correct for the overly optimistic linear
         interpolation between years.
 
@@ -290,7 +301,8 @@ class VehicleModel:
             )
 
     def drop_hybrid(self) -> None:
-        """
+        """Drop powertrains.
+
         This method drops the powertrains `PHEV-c-p`, `PHEV-c-d` and `PHEV-e` as they were only used to create the
         `PHEV` powertrain.
         :returns: Does not return anything. Modifies ``self.array`` in place.
@@ -304,7 +316,8 @@ class VehicleModel:
         )
 
     def set_electricity_consumption(self) -> None:
-        """
+        """Compute total electricity consumption.
+
         This method calculates the total electricity consumption for BEV
         and plugin-hybrid vehicles
         :returns: Does not return anything. Modifies ``self.array`` in place.
@@ -332,7 +345,7 @@ class VehicleModel:
         self["fuel consumption"] = self["fuel mass"] / _(self[var]) / _(self["fuel density per kg"])
 
     def override_ttw_energy(self):
-        # override of TtW energy, provided by the user
+        """Override of TtW energy, provided by the user."""
         if self.energy_consumption:
             for key, val in self.energy_consumption.items():
                 pwt, size, year = key
@@ -382,7 +395,8 @@ class VehicleModel:
                     ).T
 
     def calculate_ttw_energy(self) -> None:
-        """
+        """Compute required energy to operate auxiliary services.
+
         This method calculates the energy required to operate auxiliary
         services as well as to move the car. The sum is stored under the
         parameter label "TtW energy" in :attr:`self.array`.
@@ -392,8 +406,8 @@ class VehicleModel:
         pass
 
     def set_fuel_cell_mass(self):
-        """
-        Specific setup for fuel cells, which are mild hybrids.
+        """Specific setup for fuel cells, which are mild hybrids.
+
         Must be called after :meth:`.set_power_parameters`.
         """
 
@@ -443,8 +457,8 @@ class VehicleModel:
             )
 
     def set_fuel_cell_power(self) -> None:
-        """
-        Specific setup for fuel cells, which are mild hybrids.
+        """Specific setup for fuel cells, which are mild hybrids.
+
         Must be called after :meth:`.set_power_parameters`.
         """
 
@@ -461,7 +475,8 @@ class VehicleModel:
         )
 
     def set_auxiliaries(self) -> None:
-        """
+        """Power needed to operate auxialiary services.
+
         Calculates the power needed to operate the auxiliary services
         of the vehicle (heating, cooling).
 
@@ -482,15 +497,14 @@ class VehicleModel:
         )
 
     def set_recuperation(self):
+        """Set recuperation."""
         _ = lambda x: np.where(x == 0, 1, x)
         self["recuperation efficiency"] = _(
             self["transmission efficiency"] * (self["combustion power share"] < 1)
         )
 
     def set_battery_fuel_cell_replacements(self) -> None:
-        """
-        Calculates the fraction of the replacement battery
-        needed to match the vehicle lifetime.
+        """Calculate the fraction of the replacement battery needed to match the vehicle lifetime.
 
         .. note::
             if ``car lifetime`` = 200000 (km) and
@@ -546,6 +560,7 @@ class VehicleModel:
         ) * (self["fuel cell lifetime hours"] > 0)
 
     def override_vehicle_mass(self):
+        """Overide vehicle mass."""
         for key, target_mass in self.target_mass.items():
             pwt, size, year = key
 
@@ -579,8 +594,7 @@ class VehicleModel:
                 ] = target_mass
 
     def set_vehicle_masses(self) -> None:
-        """
-        Define ``curb mass``, ``driving mass``, and ``total cargo mass``.
+        """Define ``curb mass``, ``driving mass``, and ``total cargo mass``.
 
             * `curb mass <https://en.wikipedia.org/wiki/Curb_weight>`__
             is the mass of the vehicle and fuel, without people or cargo.
@@ -595,6 +609,7 @@ class VehicleModel:
         pass
 
     def override_power(self):
+        """Overide power."""
         if self.power:
             for key, power in self.power.items():
                 pwt, size, year = key
@@ -604,9 +619,9 @@ class VehicleModel:
                     ] = power
 
     def set_power_parameters(self) -> None:
-        """
-        Set electric and combustion motor powers
-        based on input parameter ``power to mass ratio``.
+        """Set electric and combustion motor powers.
+
+        It is based on input parameter ``power to mass ratio``.
         """
         # Convert from W/kg to kW
         self["power"] = self["power to mass ratio"] * self["curb mass"] / 1000
@@ -619,6 +634,7 @@ class VehicleModel:
         self["electric power"] = self["power"] * (np.array(1) - self["combustion power share"])
 
     def set_component_masses(self) -> None:
+        """Set component masses."""
         self["combustion engine mass"] = (
             self["combustion power"] * self["combustion mass per power"]
             + self["combustion fixed mass"]
@@ -633,10 +649,7 @@ class VehicleModel:
         )
 
     def set_share_recuperated_energy(self) -> None:
-        """
-        Calculate the share of recuperated energy,
-        over the total negative motive energy.
-        """
+        """Compute the share of recuperated energy over the total negative motive energy."""
 
         _ = lambda x: np.where(x == 0, 1, x)
 
@@ -660,7 +673,8 @@ class VehicleModel:
         pass
 
     def create_PHEV(self):
-        """
+        """Create plugin-hybrid vehicles.
+
         Function to create plugin-hybrid vehicles.
         PHEV-p/d is the range-weighted average
         between PHEV-c-p/PHEV-c-d and PHEV-e.
@@ -810,8 +824,8 @@ class VehicleModel:
                 )
 
     def set_battery_properties(self) -> None:
-        """
-        Calculate mass and power of batteries.
+        """Calculate mass and power of batteries.
+
         :return:
         """
 
@@ -822,8 +836,8 @@ class VehicleModel:
         )
 
     def override_battery_capacity(self) -> None:
-        """
-        Override battery capacity.
+        """Override battery capacity.
+
         :return:
         """
 
@@ -860,8 +874,8 @@ class VehicleModel:
         self.set_battery_properties()
 
     def override_range(self):
-        """
-        Set storage size or range for each powertrain.
+        """Set storage size or range for each powertrain.
+
         :return:
         """
 
@@ -916,8 +930,8 @@ class VehicleModel:
             self.set_range()
 
     def set_range(self) -> None:
-        """
-        Calculate range autonomy of vehicles
+        """Calculate range autonomy of vehicles.
+
         :return:
         """
 
@@ -933,6 +947,7 @@ class VehicleModel:
         )
 
     def check_fuel_blend(self, fuel_blend: dict) -> dict:
+        """Check fuel blend."""
         for fuel, specs in fuel_blend.items():
             if "primary" not in specs:
                 raise ValueError(f"Primary fuel not specified for {fuel}")
@@ -982,8 +997,8 @@ class VehicleModel:
         return fuel_blend
 
     def set_average_lhv(self) -> None:
-        """
-        Calculate average LHV of fuel.
+        """Calculate average LHV of fuel.
+
         :return:
         """
 
@@ -1048,9 +1063,8 @@ class VehicleModel:
             ).reshape(1, -1, 1)
 
     def set_energy_stored_properties(self) -> None:
-        """
-        Calculate size and capacity of onboard
-        energy storage components.
+        """Calculate size and capacity of onboard energy storage components.
+
         :return:
         """
 
@@ -1070,6 +1084,7 @@ class VehicleModel:
         )
 
     def set_power_battery_properties(self):
+        """Set power battery properties."""
         _ = lambda x: np.where(x == 0, 1, x)
 
         self["battery power"] = self["electric power"] * (self["combustion power share"] > 0)
@@ -1087,11 +1102,12 @@ class VehicleModel:
         )
 
     def set_cargo_mass_and_annual_mileage(self):
+        """Set cargo mass and annual mileage."""
         pass
 
     def set_costs(self) -> None:
-        """
-        Calculate the different cost types.
+        """Calculate the different cost types.
+
         :return:
         """
         self["glider cost"] = (
@@ -1176,9 +1192,8 @@ class VehicleModel:
         )
 
     def set_ttw_efficiency(self) -> None:
-        """
-        Fill in the tank-to-wheel efficiency
-        calculated by `calculate_ttw_efficiency`.
+        """Fill in the tank-to-wheel efficiency calculated by `calculate_ttw_efficiency`.
+
         :return:
         """
         _ = lambda array: np.where(array == 0, 1, array)
@@ -1194,7 +1209,8 @@ class VehicleModel:
         )
 
     def set_hot_emissions(self) -> None:
-        """
+        """Calculate hot pollutant emissions.
+
         Calculate hot pollutant emissions based on ``driving cycle``.
         The driving cycle is passed to the :class:`HotEmissionsModel` class
         and :meth:`get_emissions_per_powertrain`
@@ -1254,7 +1270,8 @@ class VehicleModel:
         ] = hot_emissions
 
     def set_particulates_emission(self) -> None:
-        """
+        """Calculate the emission of particulates.
+
         Calculate the emission of particulates according to
         https://www.eea.europa.eu/ds_resolveuid/6USNA27I4D
 
@@ -1301,7 +1318,8 @@ class VehicleModel:
         self["brake wear emissions"] *= np.array(1) - self["share recuperated energy"]
 
     def set_noise_emissions(self) -> None:
-        """
+        """Calculate noise emissions.
+
         Calculate noise emissions based on ``driving cycle``.
         The driving cycle is passed to the :class:`NoiseEmissionsModel` class
         and :meth:`get_sound_power_per_compartment`
@@ -1323,7 +1341,8 @@ class VehicleModel:
         self.array.loc[dict(parameter=list_noise_emissions)] = nem.get_sound_power_per_compartment()
 
     def calculate_cost_impacts(self, sensitivity=False) -> xr.DataArray:
-        """
+        """Get an array with cost values per vehicle-km.
+
         This method returns an array with cost values per vehicle-km,
         subdivided into the following groups:
 
