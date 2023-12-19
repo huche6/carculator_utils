@@ -37,9 +37,7 @@ def fill_xarray_from_input_parameters(input_parameters, sensitivity=False, scope
 
     # Check whether the argument passed is an instance of :class:`TruckInputParameters`
     if not isinstance(input_parameters, vip):
-        raise TypeError(
-            "The argument passed is not an object of the TruckInputParameter class"
-        )
+        raise TypeError("The argument passed is not an object of the TruckInputParameter class")
 
     if scope is None:
         scope = {

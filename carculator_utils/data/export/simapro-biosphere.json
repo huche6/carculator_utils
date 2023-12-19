@@ -9,17 +9,17 @@
     "Energy, gross calorific value, in biomass",
     "Energy, kinetic (in wind), converted"
   ],
-    [
+  [
     "natural resource",
     "Energy, gross calorific value, in biomass",
     "Energy, potential (in hydropower reservoir), converted"
   ],
-      [
+  [
     "natural resource",
     "Energy, gross calorific value, in biomass",
     "Energy, geothermal, converted"
   ],
-    [
+  [
     "air",
     "1-Butanol",
     "Butanol"
@@ -789,7 +789,7 @@
     "Iron",
     "Iron, 46% in ore, 25% in crude ore, in ground"
   ],
-   [
+  [
     "natural resource",
     "Iron",
     "Iron, in ground"
@@ -914,7 +914,7 @@
     "Nickel, Ni 3.7E-2%, Pt 4.8E-4%, Pd 2.0E-4%, Rh 2.4E-5%, Cu 5.2E-2% in ore",
     "Ni, Ni 3.7E-2%, Pt 4.8E-4%, Pd 2.0E-4%, Rh 2.4E-5%, Cu 5.2E-2% in ore, in ground"
   ],
-    [
+  [
     "natural resource",
     "Occupation, construction site",
     "Occupation, construction site"
@@ -979,7 +979,7 @@
     "Occupation, forest, intensive, short-cycle",
     "Occupation, forest, intensive"
   ],
-    [
+  [
     "natural resource",
     "Occupation, forest, extensive",
     "Occupation, forest, extensive"
@@ -999,7 +999,7 @@
     "Occupation, industrial area, built up",
     "Occupation, industrial area"
   ],
-    [
+  [
     "natural resource",
     "Occupation, industrial area, built up",
     "Occupation, dump site"
@@ -1299,7 +1299,7 @@
     "Transformation, from forest, intensive, short-cycle",
     "Transformation, from forest, intensive"
   ],
-    [
+  [
     "natural resource",
     "Transformation, from forest, extensive",
     "Transformation, from forest, extensive"
@@ -1434,7 +1434,7 @@
     "Transformation, to forest, intensive, short-cycle",
     "Transformation, to forest, intensive"
   ],
-    [
+  [
     "natural resource",
     "Transformation, to forest, extensive",
     "Transformation, to forest, extensive"
@@ -1519,7 +1519,7 @@
     "Transformation, to water bodies, artificial",
     "Transformation, to river, artificial"
   ],
-    [
+  [
     "natural resource",
     "Transformation, to heterogeneous, agricultural",
     "Transformation, to heterogeneous, agricultural"
@@ -2094,7 +2094,7 @@
     "Water, river, Europe without Switzerland",
     "Water, unspecified natural origin"
   ],
-    [
+  [
     "natural resource",
     "Water, river, Europe without Switzerland",
     "Water, river"
@@ -2559,7 +2559,7 @@
     "Water_3.1_m3",
     "Water, unspecified natural origin"
   ],
-    [
+  [
     "natural resource",
     "Wood, hard, standing",
     "Wood, hard, standing"
