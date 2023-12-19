@@ -4,17 +4,13 @@ The driving cycle returned is a numpy
 array with speed levels (in km/h) for each
 second of driving.
 """
-
 from pathlib import Path
 from typing import List, Tuple
 
 import numpy as np
 import yaml
 
-from . import DATA_DIR
-
-FILEPATH_DC_SPECS = DATA_DIR / "driving cycle" / "dc_specs.yaml"
-
+from carculator_utils import data as data_carculator
 
 def detect_vehicle_type(vehicle_sizes: List[str]) -> str:
     """Detect the type of vehicle based on the size of the vehicle."""
@@ -38,7 +34,7 @@ def get_driving_cycle_specs() -> dict:
 
     """
 
-    with open(FILEPATH_DC_SPECS, "r") as f:
+    with open(Path(data_carculator.__file__).parent / "driving cycle" / "dc_specs.yaml", "r") as f:
         return yaml.safe_load(f)
 
 
@@ -106,8 +102,8 @@ def get_standard_driving_cycle_and_gradient(
 
     """
 
-    filepath_dc = DATA_DIR / "driving cycle" / f"{vehicle_type}.csv"
-    filepath_gradient = DATA_DIR / "gradient" / f"{vehicle_type}.csv"
+    filepath_dc = Path(data_carculator.__file__).parent / "driving cycle" / f"{vehicle_type}.csv"
+    filepath_gradient = Path(data_carculator.__file__).parent / "gradient" / f"{vehicle_type}.csv"
 
     # definition of columns to select in the CSV file
     # each column corresponds to a size class

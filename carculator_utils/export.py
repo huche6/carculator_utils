@@ -10,6 +10,7 @@ import io
 import json
 import os
 import uuid
+from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
 import bw2io
@@ -19,7 +20,8 @@ import xarray as xr
 import yaml
 from bw2io.export.excel import create_valid_worksheet_name, safe_filename, xlsxwriter
 
-from . import DATA_DIR, __version__
+from carculator_utils import data as data_carculator
+from carculator_utils._version import __version__
 
 
 def load_mapping(
@@ -28,7 +30,7 @@ def load_mapping(
     """Load mapping dictionary between two versions of ecoinvent."""
 
     # Load the matching dictionary
-    filepath = DATA_DIR / "export" / filename
+    filepath = Path(data_carculator.__file__).parent / "export" / filename
     if not filepath.is_file():
         raise FileNotFoundError("The dictionary of activities flows match " "could not be found.")
     with open(filepath, encoding="utf-8") as f:
@@ -95,7 +97,7 @@ def get_simapro_subcompartments() -> Dict[str, str]:
     """
 
     filename = "simapro_subcompartments.yaml"
-    filepath = DATA_DIR / "export" / filename
+    filepath = Path(data_carculator.__file__).parent / "export" / filename
     if not filepath.is_file():
         raise FileNotFoundError(
             "The dictionary of subcompartments match "
@@ -117,7 +119,7 @@ def load_references() -> Dict[str, Dict[str, str]]:
 
     # Load the matching dictionary
     filename = "references.csv"
-    filepath = DATA_DIR / "export" / filename
+    filepath = Path(data_carculator.__file__).parent / "export" / filename
     if not filepath.is_file():
         raise FileNotFoundError("The dictionary of references could not be found.")
     with open(filepath, encoding="latin1") as file:
@@ -145,7 +147,7 @@ def get_simapro_biosphere() -> Dict[str, str]:
     """
 
     filename = "simapro-biosphere.json"
-    filepath = DATA_DIR / "export" / filename
+    filepath = Path(data_carculator.__file__).parent / "export" / filename
     if not filepath.is_file():
         raise FileNotFoundError(
             "The dictionary of biosphere flow match "
@@ -164,7 +166,7 @@ def get_simapro_technosphere() -> Dict[Tuple[str, str], str]:
     """Load the matching dictionary between ecoinvent and Simapro product flows."""
 
     filename = "simapro-technosphere-3.5.csv"
-    filepath = DATA_DIR / "export" / filename
+    filepath = Path(data_carculator.__file__).parent / "export" / filename
     with open(filepath, encoding="utf-8") as f:
         csv_list = [[val.strip() for val in r.split(";")] for r in f.readlines()]
     (_, _, *header), *data = csv_list
@@ -180,7 +182,7 @@ def get_simapro_technosphere() -> Dict[Tuple[str, str], str]:
 
 def rename_mapping(filename: str) -> Dict[str, str]:
     """Load the file rename_powertrains.yml and return a dictionary."""
-    with open(DATA_DIR / "export" / filename, encoding="utf-8") as f:
+    with open(Path(data_carculator.__file__).parent / "export" / filename, encoding="utf-8") as f:
         rename_map = yaml.safe_load(f)
 
     return rename_map
@@ -493,11 +495,19 @@ class ExportInventory:
 
         Not all biosphere flows exist in simapro.
         """
-        with open(DATA_DIR / "export" / "simapro_blacklist.yml", "r", encoding="utf-8") as f:
+        with open(
+            Path(data_carculator.__file__).parent / "export" / "simapro_blacklist.yml",
+            "r",
+            encoding="utf-8",
+        ) as f:
             blacklist = yaml.safe_load(f)
 
         # load fields list from `simapro_fields.yml`
-        with open(DATA_DIR / "export" / "simapro_fields.yml", "r", encoding="utf-8") as f:
+        with open(
+            Path(data_carculator.__file__).parent / "export" / "simapro_fields.yml",
+            "r",
+            encoding="utf-8",
+        ) as f:
             fields = yaml.safe_load(f)
 
         dict_tech = get_simapro_technosphere()

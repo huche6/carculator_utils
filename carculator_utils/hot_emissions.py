@@ -13,9 +13,7 @@ import xarray as xr
 import yaml
 from xarray import DataArray
 
-from . import DATA_DIR
-
-FILEPATH_DC_SPECS = DATA_DIR / "driving cycle" / "dc_specs.yaml"
+from carculator_utils import data as data_carculator
 
 MAP_PWT = {
     "Human": "BEV",
@@ -86,7 +84,10 @@ def get_mileage_degradation_factor(
     """
 
     corr = get_emission_factors(
-        filepath=DATA_DIR / "emission_factors" / vehicle_type / f"degradation_EF.csv",
+        filepath=Path(data_carculator.__file__).parent
+        / "emission_factors"
+        / vehicle_type
+        / f"degradation_EF.csv",
     )
 
     if corr is None:
@@ -123,7 +124,7 @@ def get_mileage_degradation_factor(
 
 def get_driving_cycle_compartments(cycle_name, vehicle_type) -> dict:
     """Get driving cycle compartments."""
-    with open(FILEPATH_DC_SPECS, "r") as f:
+    with open(Path(data_carculator.__file__).parent / "driving cycle" / "dc_specs.yaml", "r") as f:
         return yaml.safe_load(f)["environments"][vehicle_type][cycle_name]
 
 
@@ -154,16 +155,28 @@ class HotEmissionsModel:
         self.cycle_name = cycle_name
         self.vehicle_type = vehicle_type
         self.exhaust = get_emission_factors(
-            filepath=DATA_DIR / "emission_factors" / vehicle_type / f"EF_HBEFA42_exhaust.csv"
+            filepath=Path(data_carculator.__file__).parent
+            / "emission_factors"
+            / vehicle_type
+            / f"EF_HBEFA42_exhaust.csv"
         )
         self.non_exhaust = get_emission_factors(
-            filepath=DATA_DIR / "emission_factors" / vehicle_type / f"EF_HBEFA42_non_exhaust.csv"
+            filepath=Path(data_carculator.__file__).parent
+            / "emission_factors"
+            / vehicle_type
+            / f"EF_HBEFA42_non_exhaust.csv"
         )
         self.nmhc_species = get_emission_factors(
-            filepath=DATA_DIR / "emission_factors" / vehicle_type / f"NMHC_species.csv"
+            filepath=Path(data_carculator.__file__).parent
+            / "emission_factors"
+            / vehicle_type
+            / f"NMHC_species.csv"
         )
         self.engine_wear = get_emission_factors(
-            filepath=DATA_DIR / "emission_factors" / vehicle_type / f"engine_wear.csv"
+            filepath=Path(data_carculator.__file__).parent
+            / "emission_factors"
+            / vehicle_type
+            / f"engine_wear.csv"
         )
 
     def get_hot_emissions(

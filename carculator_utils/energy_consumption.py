@@ -8,6 +8,7 @@ energy needs.
 """
 
 import csv
+from pathlib import Path
 from typing import Any, List, Tuple, Union
 
 import numexpr as ne
@@ -18,7 +19,8 @@ import yaml
 from numpy import ndarray
 from xarray import DataArray
 
-from . import DATA_DIR
+from carculator_utils import data as data_carculator
+
 from .driving_cycles import get_driving_cycle_specs, get_standard_driving_cycle_and_gradient
 
 MONTHLY_AVG_TEMP = "monthly_avg_temp.csv"
@@ -49,10 +51,10 @@ def get_efficiency_coefficients(vehicle_type: str) -> [Any, None]:
     """Load yaml file to retrieve efficiency coefficients."""
 
     # if file does not exist, return None
-    if not (DATA_DIR / "efficiency" / f"{vehicle_type}.yaml").exists():
+    if not (Path(data_carculator.__file__).parent / "efficiency" / f"{vehicle_type}.yaml").exists():
         return None
 
-    with open(DATA_DIR / "efficiency" / f"{vehicle_type}.yaml") as f:
+    with open(Path(data_carculator.__file__).parent / "efficiency" / f"{vehicle_type}.yaml") as f:
         efficiency_coefficients = yaml.load(f, Loader=yaml.FullLoader)
 
     return efficiency_coefficients
@@ -65,7 +67,7 @@ def get_country_temperature(country):
     :return:
     """
 
-    with open(DATA_DIR / MONTHLY_AVG_TEMP) as f:
+    with open(Path(data_carculator.__file__).parent / MONTHLY_AVG_TEMP) as f:
         reader = csv.reader(f, delimiter=";")
         for row in reader:
             if row[2] == country:
@@ -76,7 +78,7 @@ def get_country_temperature(country):
         f"Uses those for CH instead."
     )
 
-    with open(DATA_DIR / MONTHLY_AVG_TEMP) as f:
+    with open(Path(data_carculator.__file__).parent / MONTHLY_AVG_TEMP) as f:
         reader = csv.reader(f, delimiter=";")
         for row in reader:
             if row[2] == "CH":

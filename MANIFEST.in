@@ -5,8 +5,5 @@ include *.yaml
 include *.rst
 include *.ini
 include *.csv
-include carculator_utils/data/*.csv
-include carculator_utils/data/*.json
-include carculator_utils/data/*.yaml
-include carculator_utils/data/*.yml
+recursive-include carculator_utils/data/*
 include LICENSE
