@@ -81,9 +81,9 @@ class ParticulatesEmissionsModel:
         urban_share = self.velocity.where(self.velocity < 50, 0).sum(
             dim="second"
         ) / self.velocity.sum(dim="second")
-        suburban_share = self.velocity.where(
-            (self.velocity > 50) & (self.velocity <= 80), 0
-        ).sum(dim="second") / self.velocity.sum(dim="second")
+        suburban_share = self.velocity.where((self.velocity > 50) & (self.velocity <= 80), 0).sum(
+            dim="second"
+        ) / self.velocity.sum(dim="second")
         rural_share = self.velocity.where(self.velocity > 80, 0).sum(
             dim="second"
         ) / self.velocity.sum(dim="second")

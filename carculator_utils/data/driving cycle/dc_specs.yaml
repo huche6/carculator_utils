@@ -185,21 +185,21 @@ columns:
       13m-city-double: 4
       13m-coach-double: 5
       18m: 6
-      
+
 environments:
   two-wheeler:
     Two wheeler cycle:
       urban start: 0
       urban stop: 5000
   car:
-    WLTC: 
+    WLTC:
       urban start: 0
       urban stop: 590
       suburban start: 591
       suburban stop: 1023
       rural start: 1024
       rural stop: 1801
-    
+
     WLTC 3.1:
       urban start: 0
       urban stop: 590
@@ -239,8 +239,8 @@ environments:
       suburban stop: 2077
       rural start: 2078
       rural stop: 3144
-    
-    NEDC: 
+
+    NEDC:
       urban start: 0
       urban stop: 780
       rural start: 781
