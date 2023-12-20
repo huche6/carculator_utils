@@ -8,5 +8,4 @@ xlrd
 numexpr
 bw2io
 pycountry
-wurst
 pyyaml
