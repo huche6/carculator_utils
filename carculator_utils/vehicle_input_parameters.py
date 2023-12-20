@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from klausen import NamedParameters
+from carculator_utils import NamedParameters
 
 
 def load_parameters(obj):

@@ -1,7 +1,6 @@
 pyprind
 pandas
 xarray
-klausen
 xlrd
 numexpr
 bw2io
