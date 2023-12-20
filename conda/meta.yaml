@@ -23,7 +23,6 @@ requirements:
     - pandas
     - xarray
     - numpy
-    - xlrd
     - numexpr
     - bw2io
     - pycountry
