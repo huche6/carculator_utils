@@ -36,7 +36,7 @@ class VehicleModel:
 
     """
 
-    DATA_DIR = Path(data_carculator.__file__).parent / "data"
+    DATA_DIR = Path(data_carculator.__file__).parent
 
     def __init__(
         self,
