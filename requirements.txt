@@ -4,4 +4,3 @@ pandas
 xarray
 numpy
 bw2io
-pyyaml
