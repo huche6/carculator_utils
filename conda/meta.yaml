@@ -24,7 +24,6 @@ requirements:
     - xarray
     - numpy
     - bw2io
-    - pycountry
     - pyyaml
 
 test:
