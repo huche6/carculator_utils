@@ -57,9 +57,12 @@ def get_electricity_mix() -> xr.DataArray:
     """Retrieve electricity mixes and shape them into a xarray.
 
     Source:
-        * for European countries (`ENTSOE TYNDP 2020 scenarios <https://2020.entsos-tyndp-scenarios.eu/>`_),
-        * for African countries (`TEMBA <http://www.osemosys.org/temba.html>`_ model)
-        * and for other countries (`IEA World Energy outlook 2017 <https://www.iea.org/reports/world-energy-outlook-2017>`_)
+        * for European countries
+        (`ENTSOE TYNDP 2020 scenarios <https://2020.entsos-tyndp-scenarios.eu/>`_),
+        * for African countries
+        (`TEMBA <http://www.osemosys.org/temba.html>`_ model)
+        * and for other countries
+        (`IEA World Energy outlook 2017 <https://www.iea.org/reports/world-energy-outlook-2017>`_)
 
     :returns: An axarray with 'country' and 'year' as dimensions
     :rtype: xarray.core.dataarray.DataArray
@@ -174,11 +177,15 @@ def get_fuels_specs() -> dict:
 class BackgroundSystemModel:
     """Dictionnaries that contain information to model in the background system.
 
-    Retrieve and build dictionaries that contain important information to model in the background system:
+    Retrieve and build dictionaries that contain important information to model
+    in the background system:
 
-        * gross electricity production mixes from nearly all countries in the world, from 2015 to 2050.
-        * cumulative electricity transformation/transmission/distribution losses from high voltage to medium and low voltage.
-        * share of biomass-derived fuel in the total consumption of liquid fuel in the transport sector. Source: REMIND.
+        * gross electricity production mixes from nearly all countries in the world,
+        from 2015 to 2050.
+        * cumulative electricity transformation/transmission/distribution losses
+        from high voltage to medium and low voltage.
+        * share of biomass-derived fuel in the total consumption of liquid fuel
+        in the transport sector. Source: REMIND.
         * share of bioethanol, biodiesel and biomethane, for each country, for different years.
         * share of sulfur in gasoline and diesel, for different countries and years.
     """
@@ -294,7 +301,8 @@ class BackgroundSystemModel:
         respective shares, lower heating values
         and CO2 emission factors of the fuels used.
 
-        Source for LHV: https://www.bafu.admin.ch/bafu/en/home/topics/climate/state/data/climate-reporting/references.html
+        Source for LHV:
+        https://www.bafu.admin.ch/bafu/en/home/topics/climate/state/data/climate-reporting/references.html
 
         :return:
         """

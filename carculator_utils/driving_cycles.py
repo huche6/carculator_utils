@@ -12,6 +12,7 @@ import yaml
 
 from carculator_utils import data as data_carculator
 
+
 def detect_vehicle_type(vehicle_sizes: List[str]) -> str:
     """Detect the type of vehicle based on the size of the vehicle."""
 
