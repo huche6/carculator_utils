@@ -9,11 +9,9 @@ energy needs.
 
 import csv
 from pathlib import Path
-from typing import Any, List, Tuple, Union
+from typing import Any, List, Union
 
-import numexpr as ne
 import numpy as np
-import pandas as pd
 import xarray as xr
 import yaml
 from numpy import ndarray
@@ -126,8 +124,10 @@ class EnergyConsumptionModel:
     the acceleration needed and provides
     two methods:
 
-        - :func:`~energy_consumption.EnergyConsumptionModel.aux_energy_per_km` calculates the energy needed to power auxiliary services
-        - :func:`~energy_consumption.EnergyConsumptionModel.motive_energy_per_km` calculates the energy needed to move the vehicle over 1 km
+        - :func:`~energy_consumption.EnergyConsumptionModel.aux_energy_per_km` calculates the energy
+        needed to power auxiliary services
+        - :func:`~energy_consumption.EnergyConsumptionModel.motive_energy_per_km` calculates
+        the energy needed to move the vehicle over 1 km
 
     Acceleration is calculated as the difference between velocity
     at t_2 and velocity at t_0, divided by 2.
@@ -313,7 +313,7 @@ class EnergyConsumptionModel:
         """Calculate energy used other than motive energy per km driven.
 
         :param aux_power: Total power needed for auxiliaries, heating, and cooling (W)
-        :param efficiency: Efficiency of electricity generation (dimensionless, between 0.0 and 1.0).
+        :param efficiency: Efficiency of electricity generation (dimensionless, [0.0,1.0]).
                 Battery electric vehicles should have efficiencies of one here, as we account for
                 battery efficiencies elsewhere.
         :returns: total auxiliary energy in kJ/km
@@ -453,7 +453,8 @@ class EnergyConsumptionModel:
             \frac{1}{2} \rho_{air} v^{3} A C_{d}
 
 
-        where :math:`\rho_{air}` is 1.225 (kg/m3), :math:`v` is velocity (m/s), :math:`A` is frontal area (m2), and :math:`C_{d}`
+        where :math:`\rho_{air}` is 1.225 (kg/m3), :math:`v` is velocity (m/s), :math:`A`
+        is frontal area (m2), and :math:`C_{d}`
         is the aerodynamic drag coefficient (dimensionless).
 
         """
@@ -462,7 +463,7 @@ class EnergyConsumptionModel:
         _o = lambda x: np.where((x == 0) | (x == np.nan), 1, x)
 
         # Calculate the energy used for each second of the drive cycle
-        ones = np.ones_like(self.velocity)
+        # ones = np.ones_like(self.velocity)
 
         # Resistance from the tire rolling: rolling resistance coefficient * driving mass * 9.81
         rolling_resistance = _c((driving_mass * rr_coef * 9.81).T) * (self.velocity > 0)

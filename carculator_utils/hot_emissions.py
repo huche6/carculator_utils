@@ -87,7 +87,7 @@ def get_mileage_degradation_factor(
         filepath=Path(data_carculator.__file__).parent
         / "emission_factors"
         / vehicle_type
-        / f"degradation_EF.csv",
+        / "degradation_EF.csv",
     )
 
     if corr is None:
@@ -158,25 +158,25 @@ class HotEmissionsModel:
             filepath=Path(data_carculator.__file__).parent
             / "emission_factors"
             / vehicle_type
-            / f"EF_HBEFA42_exhaust.csv"
+            / "EF_HBEFA42_exhaust.csv"
         )
         self.non_exhaust = get_emission_factors(
             filepath=Path(data_carculator.__file__).parent
             / "emission_factors"
             / vehicle_type
-            / f"EF_HBEFA42_non_exhaust.csv"
+            / "EF_HBEFA42_non_exhaust.csv"
         )
         self.nmhc_species = get_emission_factors(
             filepath=Path(data_carculator.__file__).parent
             / "emission_factors"
             / vehicle_type
-            / f"NMHC_species.csv"
+            / "NMHC_species.csv"
         )
         self.engine_wear = get_emission_factors(
             filepath=Path(data_carculator.__file__).parent
             / "emission_factors"
             / vehicle_type
-            / f"engine_wear.csv"
+            / "engine_wear.csv"
         )
 
     def get_hot_emissions(
@@ -204,7 +204,8 @@ class HotEmissionsModel:
 
         :param powertrain_type: "diesel", "petrol" or "CNG"
         :param euro_class: integer, corresponding to the EURO pollution class
-        :param energy_consumption: tank-to-wheel energy consumption for each second of the driving cycle
+        :param energy_consumption: tank-to-wheel energy consumption for each second of
+        the driving cycle
         :param yearly_km: annual mileage, to calculate cold start emissions
         :return: Pollutants emission per km driven, per air compartment.
         """

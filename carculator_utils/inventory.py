@@ -6,7 +6,6 @@ inventory.py contains InventoryCalculation which provides all methods to solve i
 import csv
 import re
 from collections import defaultdict
-from functools import lru_cache
 from pathlib import Path
 
 import numpy as np
@@ -126,7 +125,7 @@ def get_dict_input() -> dict:
     :rtype: dict
 
     """
-    filename = f"dict_inputs_A_matrix.csv"
+    filename = "dict_inputs_A_matrix.csv"
     filepath = Path(data_carculator.__file__).parent / "IAM" / filename
     if not filepath.is_file():
         raise FileNotFoundError("The dictionary of activity labels could not be found.")
@@ -148,7 +147,8 @@ class Inventory:
     :ivar vm: object from the VehicleModel class
     :ivar background_configuration: dictionary that contains choices for background system
     :ivar scenario: IAM energy scenario to use (
-        "SSP2-NPi": Nationally implemented policies, limits temperature increase by 2100 to 3.3 degrees Celsius,
+        "SSP2-NPi": Nationally implemented policies, limits temperature increase by 2100
+        to 3.3 degrees Celsius,
         "SSP2-PkBudg1150": limits temperature increase by 2100 to 2 degrees Celsius,
         "SSP2-PkBudg500": limits temperature increase by 2100 to 1.5 degrees Celsius,
         "static": no forward-looking modification of the background inventories).
@@ -512,7 +512,8 @@ class Inventory:
 
                     if powertrain in ["BEV", "BEV-opp", "BEV-depot", "BEV-motion"]:
                         chemistry = self.vm.energy_storage["electric"][(powertrain, size, year)]
-                        name = f"transport, {self.vm.vehicle_type}, {powertrain}, {chemistry} battery, {size}, {year}"
+                        name = f"transport, {self.vm.vehicle_type}, {powertrain}, "
+                        f"{chemistry} battery, {size}, {year}"
                         ref = f"transport, {self.vm.vehicle_type}"
 
                     elif powertrain in ["FCEV", "Human"]:
@@ -520,7 +521,8 @@ class Inventory:
                         ref = f"transport, {self.vm.vehicle_type}"
 
                     else:
-                        name = f"transport, {self.vm.vehicle_type}, {powertrain}, {size}, {year}, Euro-{euro_class}"
+                        name = f"transport, {self.vm.vehicle_type}, {powertrain}, "
+                        f"{size}, {year}, Euro-{euro_class}"
                         ref = f"transport, {self.vm.vehicle_type}, Euro-{euro_class}"
 
                     # add transport activity
@@ -561,9 +563,9 @@ class Inventory:
 
         # build matrix A from coordinates
         A_coords = np.genfromtxt(filepath, delimiter=";")
-        I = A_coords[:, 0].astype(int)
-        J = A_coords[:, 1].astype(int)
-        initial_A = sparse.csr_matrix((A_coords[:, 2], (I, J))).toarray()
+        i = A_coords[:, 0].astype(int)
+        j = A_coords[:, 1].astype(int)
+        initial_A = sparse.csr_matrix((A_coords[:, 2], (i, j))).toarray()
         new_A = np.identity(len(self.inputs))
         new_A[0 : np.shape(initial_A)[0], 0 : np.shape(initial_A)[0]] = initial_A
 
@@ -596,7 +598,7 @@ class Inventory:
             if all(x in str(fp) for x in [self.method, self.indicator, self.scenario])
         ]
 
-        filepaths = sorted(filepaths, key=lambda x: int(re.findall("\d+", x)[1]))
+        filepaths = sorted(filepaths, key=lambda x: int(re.findall(r"\d+", x)[1]))
 
         B = np.zeros((len(filepaths), len(self.impact_categories), len(self.inputs)))
 
@@ -623,7 +625,7 @@ class Inventory:
         )
 
     def get_index_vehicle_from_array(
-        self, items_to_look_for, items_to_look_for_also=[], method="or"
+        self, items_to_look_for, items_to_look_for_also=None, method="or"
     ):
         """Get indexes of vehicles.
 
@@ -635,6 +637,8 @@ class Inventory:
         :param items_to_look_for: string to search for
         :return: list
         """
+        if items_to_look_for is None:
+            items_to_look_for = []
         if not isinstance(items_to_look_for, list):
             items_to_look_for = [items_to_look_for]
 
@@ -657,7 +661,8 @@ class Inventory:
     def get_index_of_flows(self, items_to_look_for, search_by="name"):
         """Get indexes of flows.
 
-        Return list of row/column indices of self.A of labels that contain the string defined in `items_to_look_for`.
+        Return list of row/column indices of self.A of labels that contain the
+        string defined in `items_to_look_for`.
 
         :param items_to_look_for: string
         :param search_by: "name" or "compartment" (for elementary flows)

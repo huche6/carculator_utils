@@ -512,7 +512,7 @@ class ExportInventory:
 
         dict_tech = get_simapro_technosphere()
         dict_bio = get_simapro_biosphere()
-        simapro_subs = get_simapro_subcompartments()
+        # simapro_subs = get_simapro_subcompartments()
 
         rows = []
 
@@ -623,8 +623,8 @@ class ExportInventory:
                 if item in "Allocation rules":
                     rows.append(
                         [
-                            "In the instance of joint-production, allocation of process burden based on"
-                            "economic relative revenue of each co-product."
+                            "In the instance of joint-production, allocation of process burden "
+                            "based on economic relative revenue of each co-product."
                         ]
                     )
 
@@ -634,7 +634,8 @@ class ExportInventory:
                 if item == "Collection method":
                     rows.append(
                         [
-                            "Modeling and assumptions: https://carculator.readthedocs.io/en/latest/modeling.html"
+                            "Modeling and assumptions: "
+                            "https://carculator.readthedocs.io/en/latest/modeling.html"
                         ]
                     )
 
@@ -718,11 +719,12 @@ class ExportInventory:
                                 )
 
                                 exchange_name = (
-                                    f"{e['name'].capitalize()} {{{e.get('location', 'GLO')}}}"
+                                    f"{e['name'].capitalize()} " f"{{{e.get('location', 'GLO')}}}"
                                 )
 
                                 if exchange_name not in list_own_datasets:
-                                    exchange_name = f"{e['reference product'].capitalize()} {{{e.get('location', 'GLO')}}}"
+                                    exchange_name = f"{e['reference product'].capitalize()} "
+                                    f"{{{e.get('location', 'GLO')}}}"
 
                                     if "market" in e["name"]:
                                         exchange_name += (
@@ -736,7 +738,9 @@ class ExportInventory:
 
                                     if "production" in e["name"]:
                                         if len(e["reference product"].split(", ")) > 1:
-                                            exchange_name += f"| {e['reference product'].split(', ')[0].lower()} production, "
+                                            exchange_name += "| "
+                                            f"{e['reference product'].split(', ')[0].lower()} "
+                                            "production, "
                                             exchange_name += (
                                                 f"{e['reference product'].split(', ')[1].lower()}"
                                             )
@@ -836,10 +840,10 @@ class ExportInventory:
                     for e in a["exchanges"]:
                         if e["type"] == "biosphere" and e["categories"][0] == "soil":
                             if e["name"] not in blacklist:
-                                if len(e["categories"]) > 1:
-                                    sub_compartment = simapro_subs[e["categories"][1]]
-                                else:
-                                    sub_compartment = ""
+                                # if len(e["categories"]) > 1:
+                                #     sub_compartment = simapro_subs[e["categories"][1]]
+                                # else:
+                                #     sub_compartment = ""
 
                                 rows.append(
                                     [
@@ -955,7 +959,8 @@ class ExportInventory:
         rows.append(["Cut-off rules"])
         rows.append(
             [
-                "All environmentally-relevant flows are included, as far as the authors knowledge permits."
+                "All environmentally-relevant flows are included, "
+                "as far as the authors knowledge permits."
                 "Also, residual material (e.g., biomass residue) and energy (e.g., waste heat) "
                 "come free of burden, except for the necessary steps to make it reusable"
                 " (transport, conditioning, etc.)."
@@ -976,9 +981,10 @@ class ExportInventory:
         rows.append(["Allocation rules"])
         rows.append(
             [
-                "The system modeling is attributional. In the instance of joint-production, the allocation of "
-                "burden between co-products is generally based on the relative economic revenue of "
-                "each product, to align with the underlying database ecoinvent cut-off."
+                "The system modeling is attributional. In the instance of "
+                "joint-production, the allocation of burden between co-products is generally "
+                "based on the relative economic revenue of each product, to align with the "
+                "underlying database ecoinvent cut-off."
             ]
         )
         rows.append(["End"])
@@ -1000,7 +1006,8 @@ class ExportInventory:
         rows.append(["carculator_utils"])
         rows.append([])
         rows.append(["Description"])
-        description = "When, where and how can the electrification of passenger cars reduce greenhouse gas emissions?"
+        description = "When, where and how can the electrification of passenger cars "
+        "reduce greenhouse gas emissions?"
         description += "Romain Sacchi, Christian Bauer, Brian L. Cox and Chris L. Mutel\n"
         description += "Renewable and Sustainable Energy Reviews, 2022"
 
