@@ -19,7 +19,7 @@ from xarray import DataArray
 
 from carculator_utils import data as data_carculator
 
-from .driving_cycles import get_driving_cycle_specs, get_standard_driving_cycle_and_gradient
+from carculator_utils import get_driving_cycle_specs, get_standard_driving_cycle_and_gradient
 
 MONTHLY_AVG_TEMP = "monthly_avg_temp.csv"
 
