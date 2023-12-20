@@ -2,4 +2,3 @@ pyprind
 pandas
 xarray
 bw2io
-pyyaml
