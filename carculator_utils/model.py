@@ -1,8 +1,6 @@
-from itertools import product
 from pathlib import Path
 from typing import Dict, List, Union
 
-import numexpr as ne
 import numpy as np
 import xarray as xr
 import yaml
