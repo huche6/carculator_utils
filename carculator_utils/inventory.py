@@ -512,8 +512,8 @@ class Inventory:
 
                     if powertrain in ["BEV", "BEV-opp", "BEV-depot", "BEV-motion"]:
                         chemistry = self.vm.energy_storage["electric"][(powertrain, size, year)]
-                        name = f"transport, {self.vm.vehicle_type}, {powertrain}, "
-                        f"{chemistry} battery, {size}, {year}"
+                        name = f"""transport, {self.vm.vehicle_type}, {powertrain}, 
+                        {chemistry} battery, {size}, {year}"""
                         ref = f"transport, {self.vm.vehicle_type}"
 
                     elif powertrain in ["FCEV", "Human"]:
@@ -521,8 +521,8 @@ class Inventory:
                         ref = f"transport, {self.vm.vehicle_type}"
 
                     else:
-                        name = f"transport, {self.vm.vehicle_type}, {powertrain}, "
-                        f"{size}, {year}, Euro-{euro_class}"
+                        name = f"""transport, {self.vm.vehicle_type}, {powertrain}, 
+                        {size}, {year}, Euro-{euro_class}"""
                         ref = f"transport, {self.vm.vehicle_type}, Euro-{euro_class}"
 
                     # add transport activity
