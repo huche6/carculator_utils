@@ -2,5 +2,4 @@ pyprind
 pandas
 xarray
 bw2io
-pycountry
 pyyaml
