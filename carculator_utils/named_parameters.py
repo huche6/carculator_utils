@@ -1,7 +1,8 @@
+import warnings
 from collections.abc import Mapping
+
 import numpy as np
 import stats_arrays as sa
-import warnings
 
 
 class NamedParameters(Mapping):
@@ -30,34 +31,32 @@ class NamedParameters(Mapping):
 
     def add_parameters(self, params):
         for key, value in params.items():
-            self.metadata[key] = value.pop('metadata', {})
+            self.metadata[key] = value.pop("metadata", {})
             self.data[key] = value
 
     def _get_amount(self, dct):
-        if 'amount' in dct:
-            return dct['amount']
-        elif dct.get('kind') in ('distribution', None):
-            dist = sa.uncertainty_choices[dct['uncertainty_type']]
-            median = float(dist.ppf(
-                dist.from_dicts(dct),
-                np.array((0.5,))
-            ))
-            dct['amount'] = median
+        if "amount" in dct:
+            return dct["amount"]
+        elif dct.get("kind") in ("distribution", None):
+            dist = sa.uncertainty_choices[dct["uncertainty_type"]]
+            median = float(dist.ppf(dist.from_dicts(dct), np.array((0.5,))))
+            dct["amount"] = median
             return median
 
     def static(self):
         # Stats_arrays parameters
-        keys = sorted([key for key in self.data
-                       if self.data[key].get('kind') in ('distribution', None)])
-        self.values = {key: self._get_amount(self.data[key])
-                       for key in keys}
+        keys = sorted(
+            [key for key in self.data if self.data[key].get("kind") in ("distribution", None)]
+        )
+        self.values = {key: self._get_amount(self.data[key]) for key in keys}
         self.iterations = None
 
     def stochastic(self, iterations=1000):
         # Stats_arrays parameters
         self.iterations = iterations
-        keys = sorted([key for key in self.data
-                       if self.data[key].get('kind') in ('distribution', None)])
+        keys = sorted(
+            [key for key in self.data if self.data[key].get("kind") in ("distribution", None)]
+        )
         array = sa.UncertaintyBase.from_dicts(*[self.data[key] for key in keys])
         rng = sa.MCRandomNumberGenerator(array)
         self.values = {key: row.reshape((-1,)) for key, row in zip(keys, rng.generate(iterations))}
