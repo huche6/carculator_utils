@@ -1,7 +1,6 @@
 pyprind
 pandas
 xarray
-xlrd
 numexpr
 bw2io
 pycountry
