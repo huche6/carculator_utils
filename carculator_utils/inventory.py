@@ -487,7 +487,8 @@ class Inventory:
                 ] = maximum
 
         with open(
-            Path(data_carculator.__file__).parent / "emission_factors" / "euro_classes.yaml", "r"
+            Path(data_carculator.__file__).parent / "emission_factors" / "euro_classes.yaml",
+            "r",
         ) as stream:
             euro_classes = yaml.safe_load(stream)[self.vm.vehicle_type]
 
@@ -692,11 +693,11 @@ class Inventory:
         distribution of annually driven kilometers.
         :return:
         """
-        try:
-            losses_to_low = float(self.bs.losses[self.vm.country]["LV"])
-        except KeyError:
-            # If losses for the country are not found, assume EU average
-            losses_to_low = float(self.bs.losses["RER"]["LV"])
+        # try:
+        #    losses_to_low = float(self.bs.losses[self.vm.country]["LV"])
+        # except KeyError:
+        # If losses for the country are not found, assume EU average
+        # losses_to_low = float(self.bs.losses["RER"]["LV"])
 
         if "custom electricity mix" in self.background_configuration:
             # If a special electricity mix is specified, we use it
@@ -787,9 +788,9 @@ class Inventory:
         if not isinstance(excludes, tuple):
             excludes = tuple(excludes)
 
-        for i, input in enumerate(self.inputs):
-            if all([c in input[0] for c in contains]) and not any(
-                [e in input[0] for e in excludes]
+        for i, input_var in enumerate(self.inputs):
+            if all([c in input_var[0] for c in contains]) and not any(
+                [e in input_var[0] for e in excludes]
             ):
                 indices.append(i)
 
@@ -797,8 +798,8 @@ class Inventory:
 
     def add_electricity_infrastructure(self, dataset, losses):
         """Add transmission network for high and medium voltage."""
-        for y, year in enumerate(self.scope["year"]):
-            for input in [
+        for year in self.scope["year"]:
+            for input_var in [
                 (
                     "transmission network construction, electricity, high voltage",
                     dataset,
@@ -830,11 +831,11 @@ class Inventory:
                     np.ix_(
                         np.arange(self.iterations),
                         self.find_input_indices(
-                            input[0],
+                            input_var[0],
                         ),
-                        self.find_input_indices((input[1], str(year))),
+                        self.find_input_indices((input_var[1], str(year))),
                     )
-                ] = input[2]
+                ] = input_var[2]
 
     def create_electricity_mix_for_fuel_prep(self):
         """Electricity market.
@@ -885,8 +886,8 @@ class Inventory:
 
             if battery_origin not in self.bs.electricity_mix.country.values:
                 print(
-                    "The electricity mix for {} could not be found. Average Chinese electricity mix is used for "
-                    "battery manufacture instead.".format(self.country)
+                    "The electricity mix for {} could not be found. Average Chinese electricity "
+                    "mix is used for battery manufacture instead.".format(self.country)
                 )
                 battery_origin = "CN"
 
@@ -998,7 +999,7 @@ class Inventory:
         }
 
         # electricity dataset
-        for y, year in enumerate(self.scope["year"]):
+        for year in self.scope["year"]:
             self.A[
                 :,
                 self.find_input_indices(("electricity supply for fuel preparation, ", str(year))),
@@ -1294,7 +1295,8 @@ class Inventory:
             self.find_input_indices(("market for used Li-ion battery",)),
             self.find_input_indices((f"{self.vm.vehicle_type.capitalize()}, ",)),
         ] = self.array[
-            [self.array_inputs[l] for l in ["battery cell mass", "battery BoP mass"]], :
+            [self.array_inputs[mass] for mass in ["battery cell mass", "battery BoP mass"]],
+            :,
         ].sum(
             axis=0
         ) * (
@@ -1347,7 +1349,8 @@ class Inventory:
                 end_str = "\n \t * "
 
             print(
-                f"between {year} and {int(year + use_year)}, % of renewable: {np.round(sum_renew[y] * 100)}.",
+                f"between {year} and {int(year + use_year)}, % of renewable: "
+                f"{np.round(sum_renew[y] * 100)}.",
                 end=end_str,
             )
 
@@ -1443,7 +1446,8 @@ class Inventory:
                 end_str = "\n \t * "
 
             print(
-                f"in {year} _________________________________________ {np.round(self.vm.fuel_blend[fuel]['secondary']['share'][y] * 100)}%",
+                f"in {year} _________________________________________ "
+                f"{np.round(self.vm.fuel_blend[fuel]['secondary']['share'][y] * 100)}%",
                 end=end_str,
             )
 
@@ -1793,10 +1797,10 @@ class Inventory:
     def export_lci(
         self,
         ecoinvent_version="3.9",
-        filename=f"carculator_lci",
+        filename="carculator_lci",
         directory=None,
         software="brightway2",
-        format="bw2io",
+        export_format="bw2io",
     ):
         """Export the inventory.
 
@@ -1806,7 +1810,7 @@ class Inventory:
         :param filename: str. Name of the file to be exported
         :param directory: str. Directory where the file is saved
         :param software: str. "brightway2" or "simapro"
-        :param format: str. "bw2io" or "file" or "string"
+        :param export_format: str. "bw2io" or "file" or "string"
         ::return: inventory, or the filepath where the file is saved.
         :rtype: list
         """
@@ -1826,7 +1830,7 @@ class Inventory:
                 ecoinvent_version=ecoinvent_version,
                 directory=directory,
                 filename=filename,
-                export_format=format,
+                export_format=export_format,
             )
 
         else:
@@ -1834,5 +1838,5 @@ class Inventory:
                 ecoinvent_version=ecoinvent_version,
                 directory=directory,
                 filename=filename,
-                export_format=format,
+                export_format=export_format,
             )
