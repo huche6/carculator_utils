@@ -124,8 +124,8 @@ class VehicleModel:
 
         .. code-block:: python
 
-            with class('some powertrain') as cpm:
-                cpm['something']. # Will be filtered for the correct powertrain
+            with Class(some_powertrain) as cpm:
+                cpm["something"]  # Will be filtered for the correct powertrain
 
         On with block exit, this filter is cleared
         https://stackoverflow.com/a/10252925/164864
