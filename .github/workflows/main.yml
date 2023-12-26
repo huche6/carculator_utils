@@ -11,13 +11,14 @@ jobs:
     steps:
       - uses: mamba-org/setup-micromamba@v1
       - name: Install dependencies
-        uses: mamba-org/provision-with-micromamba@main
         with:
-          python-version: "3.11"
+          environment-file: requirements.txt
+          create-args: >-
+            python=3.11
+          cache-environment: true
 
       - name: Run all linters
         shell: bash -l -eo pipefail {0}
         run: |
-          micromamba create -n test_env -f requirements.txt -c conda-forge
           micromamba activate test_env
           pre-commit run --all-files --verbose --show-diff-on-failure
