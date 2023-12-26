@@ -48,8 +48,12 @@ class VehicleInputParameters(NamedParameters):
     EXTRA = Path(__file__, "..").resolve() / "data" / "extra_parameters.json"
 
     def __init__(self, parameters=None, extra=None, limit=None):
-        """Create a `klausen <https://github.com/cmutel/klausen>`__
-        model with the car input parameters."""
+        """Initialize the VehicleInputParameters class.
+
+        Create a `klausen <https://github.com/cmutel/klausen>`__
+        model with the car input parameters.
+        """
+
         super().__init__(None)
 
         parameters = load_parameters(self.DEFAULT if parameters is None else parameters)
