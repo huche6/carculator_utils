@@ -16,7 +16,6 @@ jobs:
           create-args: >-
             python=3.11
           cache-environment: true
-
       - name: Run all linters
         shell: bash -l -eo pipefail {0}
         run: |
