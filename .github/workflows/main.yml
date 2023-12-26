@@ -9,8 +9,8 @@ jobs:
       max-parallel: 5
 
     steps:
-      - uses: mamba-org/setup-micromamba@v1
       - name: Install dependencies
+      - uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: requirements.txt
           create-args: >-
