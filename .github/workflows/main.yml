@@ -12,7 +12,7 @@ jobs:
       - name: Install dependencies
         uses: mamba-org/setup-micromamba@v1
         with:
-          environment-file: environment-dev.yml
+          environment-file: ./environment-dev.yml
           cache-environment: true
       - name: Run all linters
         shell: bash -l -eo pipefail {0}
