@@ -12,7 +12,7 @@ jobs:
       - name: Install dependencies
         uses: mamba-org/setup-micromamba@v1
         with:
-          environment-file: requirements.txt
+          environment-file: environment-dev.yml
           create-args: >-
             python=3.11
           cache-environment: true

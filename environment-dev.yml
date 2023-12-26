@@ -1,0 +1,16 @@
+name: carculator_utils
+channels:
+  - conda-forge
+dependencies:
+  - python==3.11
+  - pytest
+  - flake8
+  - isort
+  - black
+  - pre-commit
+  - scipy
+  - pyprind
+  - pandas
+  - xarray
+  - numpy
+  - bw2io
