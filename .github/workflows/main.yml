@@ -41,4 +41,5 @@ jobs:
 
       - name: Test with pytest
         run: |
+          micromamba activate test_env
           pytest
