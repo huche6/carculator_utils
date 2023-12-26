@@ -10,7 +10,7 @@ jobs:
 
     steps:
       - name: Install dependencies
-      - uses: mamba-org/setup-micromamba@v1
+        uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: requirements.txt
           create-args: >-
