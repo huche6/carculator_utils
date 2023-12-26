@@ -1,8 +1,6 @@
-from itertools import product
 from pathlib import Path
 from typing import Dict, List, Union
 
-import numexpr as ne
 import numpy as np
 import xarray as xr
 import yaml
@@ -66,12 +64,15 @@ class VehicleModel:
         :param country: country code
         :param cycle: name of a driving cycle, or custom driving cycle
         :param gradient: series of gradients, for each second of the driving cycle
-        :param energy_storage: dictionary with selection of battery chemistry, capacity and origin for each powertrain-size-year combination
-        :param electric_utility_factor: fraction of electricity that is generated from renewable sources
+        :param energy_storage: dictionary with selection of battery chemistry, capacity and origin
+        for each powertrain-size-year combination
+        :param electric_utility_factor: fraction of electricity that is generated from
+        renewable sources
         :param drop_hybrids: boolean, if True, hybrid vehicles are dropped from the inventory
         :param payload: dictionary with payload for each powertrain-size-year combination
         :param energy_target: dictionary with energy target for each year
-        :param energy_consumption: dictionary with energy consumption for each powertrain-size-year combination
+        :param energy_consumption: dictionary with energy consumption for each
+        powertrain-size-year combination
         :param target_range: dictionary with target range for each powertrain-size-year combination
 
         """
@@ -221,8 +222,8 @@ class VehicleModel:
     def adjust_cost(self) -> None:
         """Compute energy storage over time.
 
-        This method adjusts costs of energy storage over time, to correct for the overly optimistic linear
-        interpolation between years.
+        This method adjusts costs of energy storage over time, to correct for the overly
+        optimistic linear interpolation between years.
 
         """
 
@@ -305,7 +306,8 @@ class VehicleModel:
     def drop_hybrid(self) -> None:
         """Drop powertrains.
 
-        This method drops the powertrains `PHEV-c-p`, `PHEV-c-d` and `PHEV-e` as they were only used to create the
+        This method drops the powertrains `PHEV-c-p`, `PHEV-c-d` and `PHEV-e`
+        as they were only used to create the
         `PHEV` powertrain.
         :returns: Does not return anything. Modifies ``self.array`` in place.
         """

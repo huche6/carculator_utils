@@ -8,8 +8,6 @@ from typing import Union
 import numpy as np
 import xarray as xr
 
-from .hot_emissions import get_driving_cycle_compartments
-
 
 def _(obj: Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray]:
     """Add a trailing dimension to make input arrays broadcast correctly."""

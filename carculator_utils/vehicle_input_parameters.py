@@ -22,7 +22,8 @@ class VehicleInputParameters(NamedParameters):
     default_parameters and format them into an array following the structured described
     in the *klausen* package.
 
-    :ivar sizes: List of string items e.g., ['Large', 'Lower medium', 'Medium', 'Mini', 'SUV', 'Small', 'Van']
+    :ivar sizes: List of string items e.g., ['Large', 'Lower medium', 'Medium', 'Mini',
+    'SUV', 'Small', 'Van']
     :vartype sizes: list
     :ivar powertrains: List of string items
             e.g., ['BEV', 'FCEV', 'HEV-p', 'ICEV-d', 'ICEV-g', 'ICEV-p', 'PHEV-c', 'PHEV-e']
@@ -47,7 +48,8 @@ class VehicleInputParameters(NamedParameters):
     EXTRA = Path(__file__, "..").resolve() / "data" / "extra_parameters.json"
 
     def __init__(self, parameters=None, extra=None, limit=None):
-        """Create a `klausen <https://github.com/cmutel/klausen>`__ model with the car input parameters."""
+        """Create a `klausen <https://github.com/cmutel/klausen>`__
+        model with the car input parameters."""
         super().__init__(None)
 
         parameters = load_parameters(self.DEFAULT if parameters is None else parameters)
