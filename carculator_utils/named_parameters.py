@@ -159,11 +159,7 @@ class NamedParameters(Mapping):
         """Calculate static values for parameters."""
         # Stats_arrays parameters
         keys = sorted(
-            [
-                key
-                for key in self.data
-                if self.data[key].get("kind") in ("distribution", None)
-            ]
+            [key for key in self.data if self.data[key].get("kind") in ("distribution", None)]
         )
         self.values = {key: self._get_amount(self.data[key]) for key in keys}
         self.iterations = None
@@ -180,14 +176,8 @@ class NamedParameters(Mapping):
         # Stats_arrays parameters
         self.iterations = iterations
         keys = sorted(
-            [
-                key
-                for key in self.data
-                if self.data[key].get("kind") in ("distribution", None)
-            ]
+            [key for key in self.data if self.data[key].get("kind") in ("distribution", None)]
         )
         array = sa.UncertaintyBase.from_dicts(*[self.data[key] for key in keys])
         rng = sa.MCRandomNumberGenerator(array)
-        self.values = {
-            key: row.reshape((-1,)) for key, row in zip(keys, rng.generate(iterations))
-        }
+        self.values = {key: row.reshape((-1,)) for key, row in zip(keys, rng.generate(iterations))}
