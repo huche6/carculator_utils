@@ -188,6 +188,34 @@ def rename_mapping(filename: str) -> Dict[str, str]:
     return rename_map
 
 
+def highlight_row(row):
+    """Apply bold formatting to the first element of a row if it is in the highlighted set.
+
+    Parameters
+    ----------
+    row : array-like or numpy.ndarray
+        Input row.
+
+    Returns
+    -------
+    str or None
+        If the first element of the row is in the highlighted set, returns the bolded string;
+        otherwise, returns None.
+
+    """
+
+    highlighted = {
+        "Activity",
+        "Database",
+        "Exchanges",
+        "Parameters",
+        "Database parameters",
+        "Project parameters",
+    }
+
+    return f"**{row[0]}**" if row[0] in highlighted else None
+
+
 class ExportInventory:
     """Export the inventory to various formats."""
 
@@ -747,7 +775,10 @@ class ExportInventory:
 
                                 rows.append(
                                     [
-                                        f"{dict_tech.get((e['name'], e['location']), exchange_name)} | Cut-off, U",
+                                        f"""{dict_tech.get(
+                                            (e['name'],
+                                            e['location']),
+                                            exchange_name)} | Cut-off, U""",
                                         fields["unit"][e["unit"]],
                                         "{:.3E}".format(e["amount"]),
                                         "undefined",
@@ -1113,15 +1144,7 @@ class ExportInventory:
 
         bold = workbook.add_format({"bold": True})
         bold.set_font_size(12)
-        highlighted = {
-            "Activity",
-            "Database",
-            "Exchanges",
-            "Parameters",
-            "Database parameters",
-            "Project parameters",
-        }
-        frmt = lambda x: bold if row[0] in highlighted else None
+
         sheet = workbook.add_worksheet(create_valid_worksheet_name("inventories"))
 
         for row_index, row in enumerate(formatted_data):
@@ -1129,9 +1152,9 @@ class ExportInventory:
                 if value is None:
                     continue
                 elif isinstance(value, float):
-                    sheet.write_number(row_index, col_index, value, frmt(value))
+                    sheet.write_number(row_index, col_index, value, highlight_row(value))
                 else:
-                    sheet.write_string(row_index, col_index, value, frmt(value))
+                    sheet.write_string(row_index, col_index, value, highlight_row(value))
 
         if export_format == "file":
             workbook.close()

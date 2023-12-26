@@ -18,7 +18,11 @@ from numpy import ndarray
 from xarray import DataArray
 
 from carculator_utils import data as data_carculator
-from carculator_utils import replace_zeros_in_array
+from carculator_utils import (
+    extract_values_from_datarray,
+    replace_zeros_and_nan,
+    replace_zeros_in_array,
+)
 
 from .driving_cycles import get_driving_cycle_specs, get_standard_driving_cycle_and_gradient
 
@@ -347,16 +351,16 @@ class EnergyConsumptionModel:
                 p_battery_heating.T * self.driving_time,
             )
 
-        _c = lambda x: x.values if isinstance(x, xr.DataArray) else x
-
         # Provide energy in kJ / km (1 J = 1 Ws)
         auxiliary_energy = (
-            _c(aux_power).T[None, ...] * 1000 / 1000  # Watts  # m / km  # 1 / (J / kJ)
+            extract_values_from_datarray(aux_power).T[None, ...]
+            * 1000
+            / 1000  # Watts  # m / km  # 1 / (J / kJ)
         )
 
-        efficiency = _c(efficiency)
+        efficiency = extract_values_from_datarray(efficiency)
 
-        return auxiliary_energy / _o(efficiency)
+        return auxiliary_energy / replace_zeros_in_array(efficiency)
 
     def calculate_efficiency(
         self,
@@ -462,29 +466,28 @@ class EnergyConsumptionModel:
 
         """
 
-        _c = lambda x: x.values if isinstance(x, xr.DataArray) else x
-        _o = lambda x: np.where((x == 0) | (x == np.nan), 1, x)
-
         # Calculate the energy used for each second of the drive cycle
         # ones = np.ones_like(self.velocity)
 
         # Resistance from the tire rolling: rolling resistance coefficient * driving mass * 9.81
-        rolling_resistance = _c((driving_mass * rr_coef * 9.81).T) * (self.velocity > 0)
+        rolling_resistance = extract_values_from_datarray((driving_mass * rr_coef * 9.81).T) * (
+            self.velocity > 0
+        )
 
         # Resistance from the drag: frontal area * drag coefficient * air density * 1/2 * velocity^2
-        air_resistance = _c((frontal_area * drag_coef * self.rho_air / 2).T) * np.power(
-            self.velocity, 2
-        )
+        air_resistance = extract_values_from_datarray(
+            (frontal_area * drag_coef * self.rho_air / 2).T
+        ) * np.power(self.velocity, 2)
 
         # Resistance from road gradient: driving mass * 9.81 * sin(gradient)
         gradient_resistance = (
-            _c((driving_mass * 9.81).T)
+            extract_values_from_datarray((driving_mass * 9.81).T)
             * np.sin(np.nan_to_num(self.gradient)[:, None, None, None, :])
             * (self.velocity > 0)
         )
 
         # Inertia: driving mass * acceleration
-        inertia = self.acceleration * _c(driving_mass).T
+        inertia = self.acceleration * extract_values_from_datarray(driving_mass).T
 
         total_resistance = rolling_resistance + air_resistance + gradient_resistance + inertia
         motive_energy_at_wheels = xr.where(total_resistance < 0, 0, total_resistance)
@@ -523,13 +526,21 @@ class EnergyConsumptionModel:
             )
 
             motive_energy = motive_energy_at_wheels / (
-                _o(_c(engine_efficiency))
-                * _o(_c(transmission_efficiency))
-                * _o(_c(fuel_cell_system_efficiency)).T[None, ...]
+                replace_zeros_and_nan(extract_values_from_datarray(engine_efficiency))
+                * replace_zeros_and_nan(extract_values_from_datarray(transmission_efficiency))
+                * replace_zeros_and_nan(
+                    extract_values_from_datarray(fuel_cell_system_efficiency)
+                ).T[None, ...]
             )
 
             engine_load = np.clip(
-                (motive_energy / (_o(_c(engine_power)).T * 1000)) * self.velocity, 0, 1
+                (
+                    motive_energy
+                    / (replace_zeros_and_nan(extract_values_from_datarray(engine_power)).T * 1000)
+                )
+                * self.velocity,
+                0,
+                1,
             )
 
             # add a minimum 5% engine load when the vehicle is idling
@@ -540,10 +551,10 @@ class EnergyConsumptionModel:
         negative_motive_energy = xr.where(total_resistance > 0, 0, total_resistance)
         recuperated_energy = (
             negative_motive_energy
-            * _c(recuperation_efficiency).T[None, ...]
-            * _c(battery_charge_eff).T[None, ...]
-            * _c(battery_discharge_eff).T[None, ...]
-            * (_c(electric_motor_power).T[None, ...] > 0)
+            * extract_values_from_datarray(recuperation_efficiency).T[None, ...]
+            * extract_values_from_datarray(battery_charge_eff).T[None, ...]
+            * extract_values_from_datarray(battery_discharge_eff).T[None, ...]
+            * (extract_values_from_datarray(electric_motor_power).T[None, ...] > 0)
         )
 
         if hvac_power is None:

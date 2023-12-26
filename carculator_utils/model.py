@@ -6,6 +6,7 @@ import xarray as xr
 import yaml
 
 from carculator_utils import data as data_carculator
+from carculator_utils import replace_zeros_in_array
 
 from .background_systems import BackgroundSystemModel
 from .driving_cycles import detect_vehicle_type
@@ -326,12 +327,11 @@ class VehicleModel:
         and plugin-hybrid vehicles
         :returns: Does not return anything. Modifies ``self.array`` in place.
         """
-        _ = lambda x: np.where(x == 0, 1, x)
 
         self["electricity consumption"] = (
             self["TtW energy"]
-            / _(self["battery charge efficiency"])
-            / _(self["charger efficiency"])
+            / replace_zeros_in_array(self["battery charge efficiency"])
+            / replace_zeros_in_array(self["charger efficiency"])
             / 3600
             * (self["charger mass"] > 0)
         )
@@ -346,7 +346,11 @@ class VehicleModel:
             )
         )
 
-        self["fuel consumption"] = self["fuel mass"] / _(self[var]) / _(self["fuel density per kg"])
+        self["fuel consumption"] = (
+            self["fuel mass"]
+            / replace_zeros_in_array(self[var])
+            / replace_zeros_in_array(self["fuel density per kg"])
+        )
 
     def override_ttw_energy(self):
         """Override of TtW energy, provided by the user."""
@@ -421,12 +425,10 @@ class VehicleModel:
         # it is decreased comparatively to that of a passenger car
         # to reflect increased durability
 
-        _ = lambda x: np.where(x == 0, 1, x)
-
         self["fuel cell stack mass"] = (
             self["fuel cell power density"]
             * self["fuel cell power"]
-            * (800 / _(self["fuel cell power area density"]))
+            * (800 / replace_zeros_in_array(self["fuel cell power area density"]))
         )
         self["fuel cell ancillary BoP mass"] = (
             self["fuel cell power"] * self["fuel cell ancillary BoP mass per power"]
@@ -466,11 +468,9 @@ class VehicleModel:
         Must be called after :meth:`.set_power_parameters`.
         """
 
-        _ = lambda x: np.where(x == 0, 1, x)
-
         self["fuel cell system efficiency"] = (
             self["fuel cell stack efficiency"]
-            / _(self["fuel cell own consumption"])
+            / replace_zeros_in_array(self["fuel cell own consumption"])
             * (self["fuel cell own consumption"] > 0)
         )
 
@@ -502,8 +502,8 @@ class VehicleModel:
 
     def set_recuperation(self):
         """Set recuperation."""
-        _ = lambda x: np.where(x == 0, 1, x)
-        self["recuperation efficiency"] = _(
+
+        self["recuperation efficiency"] = replace_zeros_in_array(
             self["transmission efficiency"] * (self["combustion power share"] < 1)
         )
 
@@ -551,12 +551,10 @@ class VehicleModel:
             * 3.6
         )
 
-        _ = lambda array: np.where(array == 0, 1, array)
-
         self["fuel cell lifetime replacements"] = np.ceil(
             np.clip(
                 self["lifetime kilometers"]
-                / (average_speed.T * _(self["fuel cell lifetime hours"]))
+                / (average_speed.T * replace_zeros_in_array(self["fuel cell lifetime hours"]))
                 - 1,
                 0,
                 5,
@@ -655,11 +653,11 @@ class VehicleModel:
     def set_share_recuperated_energy(self) -> None:
         """Compute the share of recuperated energy over the total negative motive energy."""
 
-        _ = lambda x: np.where(x == 0, 1, x)
-
         self["share recuperated energy"] = (
             self.energy.sel(parameter="recuperated energy").sum(dim="second")
-            / _(self.energy.sel(parameter="negative motive energy").sum(dim="second"))
+            / replace_zeros_in_array(
+                self.energy.sel(parameter="negative motive energy").sum(dim="second")
+            )
         ).values.T
         self["share recuperated energy"] *= self["combustion power share"] < 1
 
@@ -683,7 +681,6 @@ class VehicleModel:
         PHEV-p/d is the range-weighted average
         between PHEV-c-p/PHEV-c-d and PHEV-e.
         """
-        _ = lambda array: np.where(array == 0, 1, array)
 
         for pwt, pwtc in (("PHEV-d", "PHEV-c-d"), ("PHEV-p", "PHEV-c-p")):
             if pwt in self.array.coords["powertrain"].values:
@@ -1089,13 +1086,12 @@ class VehicleModel:
 
     def set_power_battery_properties(self):
         """Set power battery properties."""
-        _ = lambda x: np.where(x == 0, 1, x)
 
         self["battery power"] = self["electric power"] * (self["combustion power share"] > 0)
 
         self["battery cell mass"] += (
             self["battery power"]
-            / _(self["battery cell power density"])
+            / replace_zeros_in_array(self["battery cell power density"])
             * (self["combustion power share"] > 0)
         )
 
@@ -1141,8 +1137,7 @@ class VehicleModel:
         # at battery by efficiency of charging
         # to get costs at the "wall socket".
 
-        _ = lambda x: np.where(x == 0, 1, x)
-        self["energy cost"] /= _(self["battery charge efficiency"])
+        self["energy cost"] /= replace_zeros_in_array(self["battery charge efficiency"])
 
         self["component replacement cost"] = (
             self["energy battery cost"] * self["battery lifetime replacements"]
@@ -1200,10 +1195,9 @@ class VehicleModel:
 
         :return:
         """
-        _ = lambda array: np.where(array == 0, 1, array)
 
         self["TtW efficiency"] = (
-            _(self["fuel cell system efficiency"])
+            replace_zeros_in_array(self["fuel cell system efficiency"])
             * self["transmission efficiency"]
             * self["engine efficiency"]
         )

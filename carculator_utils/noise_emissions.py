@@ -11,6 +11,8 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from carculator_utils import replace_below_one
+
 MAP_PWT = {
     "ICEV-p": "ICEV",
     "ICEV-d": "ICEV",
@@ -139,10 +141,8 @@ class NoiseEmissionsModel:
         if self.rolling_coefficients is None:
             return np.zeros_like(_(self.velocity))
 
-        _nz = lambda x: np.where(x < 1, 1, x)
-
         array = np.repeat(
-            np.log10(_nz(_(self.velocity) / 70), where=(_(self.velocity) > 0)),
+            np.log10(replace_below_one(_(self.velocity) / 70), where=(_(self.velocity) > 0)),
             8,
             axis=-1,
         )
@@ -187,10 +187,11 @@ class NoiseEmissionsModel:
         if self.propulsion_coefficients is None:
             return np.zeros_like(_(self.velocity))
 
-        _nz = lambda x: np.where(x < 1, 1, x)
-
         array = np.repeat(
-            np.log10(_nz((_(self.velocity) - 70) / 70), where=(_(self.velocity) > 0)),
+            np.log10(
+                replace_below_one((_(self.velocity) - 70) / 70),
+                where=(_(self.velocity) > 0),
+            ),
             8,
             axis=-1,
         )
