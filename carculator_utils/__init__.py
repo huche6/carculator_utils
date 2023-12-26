@@ -10,7 +10,7 @@ Submodules
 
 
 """
-from .data_transformation import isarray  # isort:skip
+from .data_management import isarray, replace_zeros_in_array  # isort:skip
 
 from .background_systems import BackgroundSystemModel
 from .driving_cycles import get_standard_driving_cycle_and_gradient
@@ -22,6 +22,7 @@ from .vehicle_input_parameters import VehicleInputParameters
 
 __all__ = (
     "isarray",
+    "replace_zeros_in_array",
     "get_standard_driving_cycle_and_gradient",
     "NoiseEmissionsModel",
     "HotEmissionsModel",

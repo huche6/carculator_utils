@@ -18,6 +18,7 @@ from numpy import ndarray
 from xarray import DataArray
 
 from carculator_utils import data as data_carculator
+from carculator_utils import replace_zeros_in_array
 
 from .driving_cycles import get_driving_cycle_specs, get_standard_driving_cycle_and_gradient
 
@@ -320,8 +321,6 @@ class EnergyConsumptionModel:
 
         """
 
-        _o = lambda x: np.where(x == 0, 1, x)
-
         if hvac_power is not None:
             (
                 p_cooling,
@@ -336,9 +335,13 @@ class EnergyConsumptionModel:
 
             return (
                 aux_power.T.values * np.where(self.velocity > 0, 1, 0),
-                (p_cooling / _o(heat_pump_cop_cooling) * cooling_consumption).T.values
+                (
+                    p_cooling / replace_zeros_in_array(heat_pump_cop_cooling) * cooling_consumption
+                ).T.values
                 * self.driving_time,
-                (p_heating / _o(heat_pump_cop_heating) * heating_consumption).T.values
+                (
+                    p_heating / replace_zeros_in_array(heat_pump_cop_heating) * heating_consumption
+                ).T.values
                 * self.driving_time,
                 p_battery_cooling.T * self.driving_time,
                 p_battery_heating.T * self.driving_time,
