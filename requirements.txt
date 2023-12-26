@@ -1,8 +1,6 @@
-scipy
 pyprind
 pandas
 xarray
-numpy
 klausen
 xlrd
 numexpr
