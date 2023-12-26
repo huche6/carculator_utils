@@ -23,3 +23,22 @@ jobs:
         run: |
           micromamba activate test_env
           pre-commit run --all-files --verbose --show-diff-on-failure
+
+  run-test:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        uses: mamba-org/setup-micromamba@v1
+        with:
+          environment-file: environment-dev.yml
+          environment-name: test_env
+          cache-environment: true
+
+      - name: Test with pytest
+        run: |
+          pytest
