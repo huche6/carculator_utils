@@ -14,6 +14,7 @@ import xarray as xr
 import yaml
 
 from carculator_utils import data as data_carculator
+from carculator_utils import isarray
 
 
 def data_to_dict(csv_list: list) -> dict:
@@ -167,7 +168,9 @@ def get_fuels_specs() -> dict:
     Contains names, LHV, CO2 emission factors.
     """
     with open(
-        Path(data_carculator.__file__).parent / "fuel" / "fuel_specs.yaml", "r", encoding="utf-8"
+        Path(data_carculator.__file__).parent / "fuel" / "fuel_specs.yaml",
+        "r",
+        encoding="utf-8",
     ) as stream:
         fuel_specs = yaml.safe_load(stream)
 
@@ -316,8 +319,6 @@ class BackgroundSystemModel:
             "hydrogen": ["FCEV"],
         }
 
-        _arr = lambda x: np.asarray(x) if not isinstance(x, np.ndarray) else x
-
         for fuel_type, pwt in fuel_to_powertrains_map.items():
             if any(i in powertrains for i in pwt):
                 (
@@ -327,8 +328,8 @@ class BackgroundSystemModel:
                     secondary_share,
                 ) = self.find_fuel_shares(fuel_blend, fuel_type, country, years)
 
-                primary_share = _arr(primary_share)
-                secondary_share = _arr(secondary_share)
+                primary_share = isarray(primary_share)
+                secondary_share = isarray(secondary_share)
 
                 # add a trailing dimension to the array if it is 0D
                 if primary_share.ndim == 0:

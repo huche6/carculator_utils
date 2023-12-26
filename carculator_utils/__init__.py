@@ -10,6 +10,7 @@ Submodules
 
 
 """
+from .data_transformation import isarray  # isort:skip
 
 from .background_systems import BackgroundSystemModel
 from .driving_cycles import get_standard_driving_cycle_and_gradient
@@ -20,6 +21,7 @@ from .noise_emissions import NoiseEmissionsModel
 from .vehicle_input_parameters import VehicleInputParameters
 
 __all__ = (
+    "isarray",
     "get_standard_driving_cycle_and_gradient",
     "NoiseEmissionsModel",
     "HotEmissionsModel",
