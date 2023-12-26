@@ -8,9 +8,7 @@ dependencies:
   - isort
   - black
   - pre-commit
-  - scipy
   - pyprind
   - pandas
   - xarray
-  - numpy
   - bw2io
