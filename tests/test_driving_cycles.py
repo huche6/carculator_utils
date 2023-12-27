@@ -1,15 +1,12 @@
-from carculator_utils.driving_cycles import detect_vehicle_type, get_driving_cycle_specs
 import pytest
+
+from carculator_utils.driving_cycles import detect_vehicle_type, get_driving_cycle_specs
 
 
 class TestDrivingCycleFunctions:
     @pytest.mark.parametrize(
         "two_wheeler_types",
-        list(
-            (
-                get_driving_cycle_specs()["columns"]["two-wheeler"]["Two wheeler cycle"]
-            ).keys()
-        ),
+        list((get_driving_cycle_specs()["columns"]["two-wheeler"]["Two wheeler cycle"]).keys()),
     )
     def test_detect_vehicle_type_two_wheeler(self, two_wheeler_types):
         assert detect_vehicle_type(two_wheeler_types) == "two-wheeler"
@@ -18,7 +15,7 @@ class TestDrivingCycleFunctions:
         "car_driving_types",
         list(list(get_driving_cycle_specs()["columns"]["car"].values())[0].keys()),
     )
-    def test_detect_vehicle_type_two_wheeler(self, car_driving_types):
+    def test_detect_vehicle_type_car(self, car_driving_types):
         assert detect_vehicle_type(car_driving_types) == "car"
 
     @pytest.mark.parametrize(
