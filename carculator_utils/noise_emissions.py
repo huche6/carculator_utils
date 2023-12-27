@@ -276,17 +276,13 @@ class NoiseEmissionsModel:
 
         distance = (self.velocity / 3600).sum(axis=0)
 
-        urban_noise = np.where(_(self.velocity) <= 50, sound_power, 0).sum(axis=0) / _(
-            distance
-        )
+        urban_noise = np.where(_(self.velocity) <= 50, sound_power, 0).sum(axis=0) / _(distance)
 
         suburban_noise = np.where(
             (_(self.velocity) > 50) & (_(self.velocity) <= 80), sound_power, 0
         ).sum(axis=0) / _(distance)
 
-        rural_noise = np.where(_(self.velocity) > 80, sound_power, 0).sum(axis=0) / _(
-            distance
-        )
+        rural_noise = np.where(_(self.velocity) > 80, sound_power, 0).sum(axis=0) / _(distance)
 
         res = np.concatenate(
             (
