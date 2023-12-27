@@ -18,15 +18,9 @@ from numpy import ndarray
 from xarray import DataArray
 
 from carculator_utils import data as data_carculator
-from carculator_utils import (
-    extract_values_from_datarray,
-    replace_values_in_array,
-)
+from carculator_utils import extract_values_from_datarray, replace_values_in_array
 
-from .driving_cycles import (
-    get_driving_cycle_specs,
-    get_standard_driving_cycle_and_gradient,
-)
+from .driving_cycles import get_driving_cycle_specs, get_standard_driving_cycle_and_gradient
 
 MONTHLY_AVG_TEMP = "monthly_avg_temp.csv"
 
@@ -56,14 +50,10 @@ def get_efficiency_coefficients(vehicle_type: str) -> [Any, None]:
     """Load yaml file to retrieve efficiency coefficients."""
 
     # if file does not exist, return None
-    if not (
-        Path(data_carculator.__file__).parent / "efficiency" / f"{vehicle_type}.yaml"
-    ).exists():
+    if not (Path(data_carculator.__file__).parent / "efficiency" / f"{vehicle_type}.yaml").exists():
         return None
 
-    with open(
-        Path(data_carculator.__file__).parent / "efficiency" / f"{vehicle_type}.yaml"
-    ) as f:
+    with open(Path(data_carculator.__file__).parent / "efficiency" / f"{vehicle_type}.yaml") as f:
         efficiency_coefficients = yaml.load(f, Loader=yaml.FullLoader)
 
     return efficiency_coefficients
@@ -240,9 +230,7 @@ class EnergyConsumptionModel:
                     len(self.ambient_temperature) == 12
                 ), "Ambient temperature must be a 12-month array"
         else:
-            self.ambient_temperature = np.resize(
-                get_country_temperature(self.country), (12,)
-            )
+            self.ambient_temperature = np.resize(get_country_temperature(self.country), (12,))
 
         if self.indoor_temperature is not None:
             if isinstance(self.indoor_temperature, (float, int)):
@@ -266,9 +254,7 @@ class EnergyConsumptionModel:
         p_heating = (
             np.where(
                 self.ambient_temperature < self.indoor_temperature,
-                np.interp(
-                    self.ambient_temperature, amb_temp_data_points, pct_power_HVAC
-                ),
+                np.interp(self.ambient_temperature, amb_temp_data_points, pct_power_HVAC),
                 0,
             ).mean()
             * hvac_power
@@ -279,9 +265,7 @@ class EnergyConsumptionModel:
         p_cooling = (
             np.where(
                 self.ambient_temperature >= self.indoor_temperature,
-                np.interp(
-                    self.ambient_temperature, amb_temp_data_points, pct_power_HVAC
-                ),
+                np.interp(self.ambient_temperature, amb_temp_data_points, pct_power_HVAC),
                 0,
             ).mean()
             * hvac_power
@@ -291,15 +275,11 @@ class EnergyConsumptionModel:
         # and battery heating
 
         # battery cooling occurring above 20C, in W
-        p_battery_cooling = np.where(
-            self.ambient_temperature > 20, _(battery_cooling_unit), 0
-        )
+        p_battery_cooling = np.where(self.ambient_temperature > 20, _(battery_cooling_unit), 0)
         p_battery_cooling = p_battery_cooling.mean(-1)
 
         # battery heating occurring below 5C, in W
-        p_battery_heating = np.where(
-            self.ambient_temperature < 5, _(battery_heating_unit), 0
-        )
+        p_battery_heating = np.where(self.ambient_temperature < 5, _(battery_heating_unit), 0)
         p_battery_heating = p_battery_heating.mean(-1)
 
         return p_cooling, p_heating, p_battery_cooling, p_battery_heating
@@ -421,9 +401,7 @@ class EnergyConsumptionModel:
                         dtype=float,
                     ),
                     np.fromiter(
-                        self.efficiency_coefficients[pwts[pwt]][
-                            efficiency_type
-                        ].values(),
+                        self.efficiency_coefficients[pwts[pwt]][efficiency_type].values(),
                         dtype=float,
                     ),
                 ),
@@ -492,9 +470,9 @@ class EnergyConsumptionModel:
         # ones = np.ones_like(self.velocity)
 
         # Resistance from the tire rolling: rolling resistance coefficient * driving mass * 9.81
-        rolling_resistance = extract_values_from_datarray(
-            (driving_mass * rr_coef * 9.81).T
-        ) * (self.velocity > 0)
+        rolling_resistance = extract_values_from_datarray((driving_mass * rr_coef * 9.81).T) * (
+            self.velocity > 0
+        )
 
         # Resistance from the drag: frontal area * drag coefficient * air density * 1/2 * velocity^2
         air_resistance = extract_values_from_datarray(
@@ -511,9 +489,7 @@ class EnergyConsumptionModel:
         # Inertia: driving mass * acceleration
         inertia = self.acceleration * extract_values_from_datarray(driving_mass).T
 
-        total_resistance = (
-            rolling_resistance + air_resistance + gradient_resistance + inertia
-        )
+        total_resistance = rolling_resistance + air_resistance + gradient_resistance + inertia
         motive_energy_at_wheels = xr.where(total_resistance < 0, 0, total_resistance)
         motive_energy = np.zeros_like(motive_energy_at_wheels)
 
@@ -532,9 +508,7 @@ class EnergyConsumptionModel:
         # or while len(engine_load_iterations) < 10
 
         while len(engine_load_iterations) < 10:
-            engine_efficiency = self.calculate_efficiency(
-                engine_efficiency, engine_load, "engine"
-            )
+            engine_efficiency = self.calculate_efficiency(engine_efficiency, engine_load, "engine")
 
             transmission_efficiency = self.calculate_efficiency(
                 transmission_efficiency, engine_load, "transmission"

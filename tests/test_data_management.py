@@ -1,11 +1,7 @@
-import pytest
-from xarray import DataArray
 import numpy as np
+import pytest
 
-from carculator_utils import (
-    isarray,
-    replace_values_in_array,
-)
+from carculator_utils import isarray, replace_values_in_array
 
 
 class TestDataManagement:
@@ -22,6 +18,4 @@ class TestDataManagement:
         ],
     )
     def test_replace_values_in_array(self, x, cond):
-        np.testing.assert_array_equal(
-            replace_values_in_array(x, cond), np.array([1, 1, 1, 1, 1])
-        )
+        np.testing.assert_array_equal(replace_values_in_array(x, cond), np.array([1, 1, 1, 1, 1]))
