@@ -14,9 +14,7 @@ Submodules
 from .data_management import (  # isort:skip
     extract_values_from_datarray,
     isarray,
-    replace_zeros_and_nan,
-    replace_zeros_in_array,
-    replace_below_one,
+    replace_values_in_array,
 )
 
 from .background_systems import BackgroundSystemModel
@@ -29,10 +27,8 @@ from .vehicle_input_parameters import VehicleInputParameters
 
 __all__ = (
     "isarray",
-    "replace_zeros_in_array",
     "extract_values_from_datarray",
-    "replace_zeros_and_nan",
-    "replace_below_one",
+    "replace_values_in_array",
     "get_standard_driving_cycle_and_gradient",
     "NoiseEmissionsModel",
     "HotEmissionsModel",

@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from carculator_utils import replace_below_one
+from carculator_utils import replace_values_in_array
 
 MAP_PWT = {
     "ICEV-p": "ICEV",
@@ -142,7 +142,10 @@ class NoiseEmissionsModel:
             return np.zeros_like(_(self.velocity))
 
         array = np.repeat(
-            np.log10(replace_below_one(_(self.velocity) / 70), where=(_(self.velocity) > 0)),
+            np.log10(
+                replace_values_in_array(_(self.velocity) / 70),
+                where=(_(self.velocity) > 0, lambda x: x < 1),
+            ),
             8,
             axis=-1,
         )
@@ -189,7 +192,7 @@ class NoiseEmissionsModel:
 
         array = np.repeat(
             np.log10(
-                replace_below_one((_(self.velocity) - 70) / 70),
+                replace_values_in_array((_(self.velocity) - 70) / 70, lambda x: x < 1),
                 where=(_(self.velocity) > 0),
             ),
             8,
@@ -273,13 +276,17 @@ class NoiseEmissionsModel:
 
         distance = (self.velocity / 3600).sum(axis=0)
 
-        urban_noise = np.where(_(self.velocity) <= 50, sound_power, 0).sum(axis=0) / _(distance)
+        urban_noise = np.where(_(self.velocity) <= 50, sound_power, 0).sum(axis=0) / _(
+            distance
+        )
 
         suburban_noise = np.where(
             (_(self.velocity) > 50) & (_(self.velocity) <= 80), sound_power, 0
         ).sum(axis=0) / _(distance)
 
-        rural_noise = np.where(_(self.velocity) > 80, sound_power, 0).sum(axis=0) / _(distance)
+        rural_noise = np.where(_(self.velocity) > 80, sound_power, 0).sum(axis=0) / _(
+            distance
+        )
 
         res = np.concatenate(
             (
