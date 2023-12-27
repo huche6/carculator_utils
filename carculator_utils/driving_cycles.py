@@ -46,7 +46,9 @@ def get_driving_cycle_specs() -> dict:
         return yaml.safe_load(f)
 
 
-def get_dc_column_number(vehicle_type: str, vehicle_size: List[str], dc_name: str) -> List[int]:
+def get_dc_column_number(
+    vehicle_type: str, vehicle_size: List[str], dc_name: str
+) -> List[int]:
     """
     Loads YAML file that contains the column number.
     Return the column number given a vehicle type and driving cycle name.
@@ -69,7 +71,10 @@ def get_dc_column_number(vehicle_type: str, vehicle_size: List[str], dc_name: st
             f"available driving cycles: {list(dc_specs['columns'][vehicle_type].keys())}"
         )
 
-    if not all(vehicle in dc_specs["columns"][vehicle_type][dc_name] for vehicle in vehicle_size):
+    if not all(
+        vehicle in dc_specs["columns"][vehicle_type][dc_name]
+        for vehicle in vehicle_size
+    ):
         raise KeyError(
             f"Vehicle size(s) {vehicle_size} is not in the list of "
             f"available vehicle sizes: {list(dc_specs['columns'][vehicle_type][dc_name].keys())}"
@@ -78,7 +83,9 @@ def get_dc_column_number(vehicle_type: str, vehicle_size: List[str], dc_name: st
     return [dc_specs["columns"][vehicle_type][dc_name][s] for s in vehicle_size]
 
 
-def get_data(filepath: Path, vehicle_type: str, vehicle_sizes: List[str], name: str) -> np.ndarray:
+def get_data(
+    filepath: Path, vehicle_type: str, vehicle_sizes: List[str], name: str
+) -> np.ndarray:
     try:
         col = get_dc_column_number(vehicle_type, vehicle_sizes, name)
         arr = np.genfromtxt(filepath, delimiter=";")

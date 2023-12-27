@@ -32,7 +32,9 @@ def load_mapping(
     # Load the matching dictionary
     filepath = DATA_DIR / "export" / filename
     if not filepath.is_file():
-        raise FileNotFoundError("The dictionary of activities flows match " "could not be found.")
+        raise FileNotFoundError(
+            "The dictionary of activities flows match " "could not be found."
+        )
     with open(filepath, encoding="utf-8") as f:
         csv_list = [[val.strip() for val in r.split(";")] for r in f.readlines()]
     (_, _, *header), *data = csv_list
@@ -192,7 +194,9 @@ class ExportInventory:
 
     """
 
-    def __init__(self, array, vehicle_model, indices, db_name="carculator_utils export"):
+    def __init__(
+        self, array, vehicle_model, indices, db_name="carculator_utils export"
+    ):
         self.array: xr.DataArray = array
         self.indices: Dict[int, Tuple[str, str, str, str]] = indices
         self.vm = vehicle_model
@@ -275,10 +279,14 @@ class ExportInventory:
                 mult_factor = 1
 
                 if ecoinvent_version != "3.8":
-                    tuple_output = self.flow_map[ecoinvent_version].get(tuple_output, tuple_output)
+                    tuple_output = self.flow_map[ecoinvent_version].get(
+                        tuple_output, tuple_output
+                    )
 
                     if ecoinvent_version != "3.9":
-                        tuple_input = self.flow_map[ecoinvent_version].get(tuple_input, tuple_input)
+                        tuple_input = self.flow_map[ecoinvent_version].get(
+                            tuple_input, tuple_input
+                        )
                     else:
                         if len(tuple_input) == 3:
                             key_input = (
@@ -296,7 +304,9 @@ class ExportInventory:
                                 tuple_input[2],
                                 tuple_input[3],
                             )
-                        tuple_input = self.flow_map[ecoinvent_version].get(key_input, tuple_input)
+                        tuple_input = self.flow_map[ecoinvent_version].get(
+                            key_input, tuple_input
+                        )
 
                         # remove blanks from tuple
                         tuple_input = tuple([i for i in tuple_input if i != ""])
@@ -310,7 +320,9 @@ class ExportInventory:
 
                 else:
                     raise ValueError(
-                        "Inventory export not " "implemented for " "stochastic analyses."
+                        "Inventory export not "
+                        "implemented for "
+                        "stochastic analyses."
                     )
 
                 exc = {
@@ -347,7 +359,11 @@ class ExportInventory:
                 special_remark = self.references[tuple_output[0]]["special remark"]
             else:
                 try:
-                    key = [k for k in self.references if k.lower() in tuple_output[0].lower()][0]
+                    key = [
+                        k
+                        for k in self.references
+                        if k.lower() in tuple_output[0].lower()
+                    ][0]
                     source = self.references[key]["source"]
                     description = self.references[key]["description"]
                     special_remark = self.references[key]["special remark"]
@@ -371,7 +387,9 @@ class ExportInventory:
                     and any([w in tuple_output[0] for w in available_sizes])
                     and any([str(w) in tuple_output[0] for w in available_years])
                 ):
-                    possible_pwt = [w for w in available_powertrains if w in tuple_output[0]]
+                    possible_pwt = [
+                        w for w in available_powertrains if w in tuple_output[0]
+                    ]
 
                     if len(possible_pwt) > 1:
                         pwt = max(possible_pwt, key=len)
@@ -494,14 +512,20 @@ class ExportInventory:
 
         return rows
 
-    def format_data_for_lci_for_simapro(self, data: List[Dict], ei_version: str) -> List[List]:
+    def format_data_for_lci_for_simapro(
+        self, data: List[Dict], ei_version: str
+    ) -> List[List]:
         # not all biosphere flows exist in simapro
         # load list from `simapro_blacklist.yml`
-        with open(DATA_DIR / "export" / "simapro_blacklist.yml", "r", encoding="utf-8") as f:
+        with open(
+            DATA_DIR / "export" / "simapro_blacklist.yml", "r", encoding="utf-8"
+        ) as f:
             blacklist = yaml.safe_load(f)
 
         # load fields list from `simapro_fields.yml`
-        with open(DATA_DIR / "export" / "simapro_fields.yml", "r", encoding="utf-8") as f:
+        with open(
+            DATA_DIR / "export" / "simapro_fields.yml", "r", encoding="utf-8"
+        ) as f:
             fields = yaml.safe_load(f)
 
         dict_tech = get_simapro_technosphere()
@@ -512,14 +536,18 @@ class ExportInventory:
 
         for item in fields["headers"]:
             if item.startswith("{date"):
-                item = item.replace("date", datetime.datetime.today().strftime("%d/%m/%Y"))
+                item = item.replace(
+                    "date", datetime.datetime.today().strftime("%d/%m/%Y")
+                )
             rows.append([item])
         rows.append([])
 
         list_own_datasets = []
 
         for a in data:
-            list_own_datasets.append(f"{a['name'].capitalize()} {{{a.get('location', 'GLO')}}})")
+            list_own_datasets.append(
+                f"{a['name'].capitalize()} {{{a.get('location', 'GLO')}}})"
+            )
 
         # We loop through the activities
         for a in data:
@@ -533,16 +561,26 @@ class ExportInventory:
             else:
                 # if we cannot find it, it's because some keys are more general
                 try:
-                    key = [k for k in self.references.keys() if k.lower() in a["name"].lower()][0]
+                    key = [
+                        k
+                        for k in self.references.keys()
+                        if k.lower() in a["name"].lower()
+                    ][0]
                 except IndexError:
                     if self.vm.vehicle_type in a["name"].lower():
                         pass
                     else:
                         print(a["name"])
-                main_category = self.references.get(key, {"category 1": None}).get("category 1")
-                category = self.references.get(key, {"category 2": None}).get("category 2")
+                main_category = self.references.get(key, {"category 1": None}).get(
+                    "category 1"
+                )
+                category = self.references.get(key, {"category 2": None}).get(
+                    "category 2"
+                )
                 source = self.references.get(key, {"source": None}).get("source")
-                description = self.references.get(key, {"description": None}).get("description")
+                description = self.references.get(key, {"description": None}).get(
+                    "description"
+                )
                 special_remark = self.references.get(key, {"special remark": None}).get(
                     "special remark"
                 )
@@ -560,9 +598,7 @@ class ExportInventory:
                 rows.append([item])
 
                 if item == "Process name":
-                    dataset_name = (
-                        f"{a['name'].capitalize()} {{{a.get('location', 'GLO')}}} | Cut-off U"
-                    )
+                    dataset_name = f"{a['name'].capitalize()} {{{a.get('location', 'GLO')}}} | Cut-off U"
                     rows.append([dataset_name])
 
                 if item == "Type":
@@ -651,7 +687,9 @@ class ExportInventory:
                         if e["type"] == "production":
                             rows.append(
                                 [
-                                    dict_tech.get((a["name"], a["location"]), dataset_name),
+                                    dict_tech.get(
+                                        (a["name"], a["location"]), dataset_name
+                                    ),
                                     fields["unit"][a["unit"]],
                                     1.0,
                                     "100%",
@@ -711,29 +749,21 @@ class ExportInventory:
                                     tupled, tupled
                                 )
 
-                                exchange_name = (
-                                    f"{e['name'].capitalize()} {{{e.get('location', 'GLO')}}}"
-                                )
+                                exchange_name = f"{e['name'].capitalize()} {{{e.get('location', 'GLO')}}}"
 
                                 if exchange_name not in list_own_datasets:
                                     exchange_name = f"{e['reference product'].capitalize()} {{{e.get('location', 'GLO')}}}"
 
                                     if "market" in e["name"]:
-                                        exchange_name += (
-                                            f"| market for {e['reference product'].lower()}"
-                                        )
+                                        exchange_name += f"| market for {e['reference product'].lower()}"
 
                                     if "market group" in e["name"]:
-                                        exchange_name += (
-                                            f"| market group for {e['reference product'].lower()}"
-                                        )
+                                        exchange_name += f"| market group for {e['reference product'].lower()}"
 
                                     if "production" in e["name"]:
                                         if len(e["reference product"].split(", ")) > 1:
                                             exchange_name += f"| {e['reference product'].split(', ')[0].lower()} production, "
-                                            exchange_name += (
-                                                f"{e['reference product'].split(', ')[1].lower()}"
-                                            )
+                                            exchange_name += f"{e['reference product'].split(', ')[1].lower()}"
 
                                 rows.append(
                                     [
@@ -749,7 +779,10 @@ class ExportInventory:
 
                 if item == "Resources":
                     for e in a["exchanges"]:
-                        if e["type"] == "biosphere" and e["categories"][0] == "natural resource":
+                        if (
+                            e["type"] == "biosphere"
+                            and e["categories"][0] == "natural resource"
+                        ):
                             if e["name"] not in blacklist:
                                 rows.append(
                                     [
@@ -766,9 +799,9 @@ class ExportInventory:
 
                 if item == "Emissions to air":
                     for e in a["exchanges"]:
-                        if (e["type"] == "biosphere" and e["categories"][0] == "air") or e[
-                            "name"
-                        ] in [
+                        if (
+                            e["type"] == "biosphere" and e["categories"][0] == "air"
+                        ) or e["name"] in [
                             "Carbon dioxide, from soil or biomass stock",
                             "Carbon dioxide, to soil or biomass stock",
                         ]:
@@ -777,7 +810,9 @@ class ExportInventory:
                                     e["unit"] = "kilogram"
                                     e["amount"] /= 1000
 
-                                if e["name"] in ["Carbon dioxide, to soil or biomass stock"]:
+                                if e["name"] in [
+                                    "Carbon dioxide, to soil or biomass stock"
+                                ]:
                                     rows.append(
                                         [
                                             dict_bio.get(e["name"], e["name"]),
@@ -995,7 +1030,9 @@ class ExportInventory:
         rows.append([])
         rows.append(["Description"])
         description = "When, where and how can the electrification of passenger cars reduce greenhouse gas emissions?"
-        description += "Romain Sacchi, Christian Bauer, Brian L. Cox and Chris L. Mutel\n"
+        description += (
+            "Romain Sacchi, Christian Bauer, Brian L. Cox and Chris L. Mutel\n"
+        )
         description += "Renewable and Sustainable Energy Reviews, 2022"
 
         rows.append([description])
@@ -1017,7 +1054,9 @@ class ExportInventory:
         filename: str = None,
         export_format: str = "file",
     ):
-        filename = filename or safe_filename(f"carculator_export_{datetime.date.today()}")
+        filename = filename or safe_filename(
+            f"carculator_export_{datetime.date.today()}"
+        )
 
         filename += "_simapro.csv"
 
@@ -1027,7 +1066,9 @@ class ExportInventory:
             ecoinvent_version=ecoinvent_version,
         )
 
-        rows = self.format_data_for_lci_for_simapro(data=list_act, ei_version=ecoinvent_version)
+        rows = self.format_data_for_lci_for_simapro(
+            data=list_act, ei_version=ecoinvent_version
+        )
 
         if export_format == "file":
             with open(filepath_export, "w", newline="", encoding="latin1") as csvFile:
@@ -1079,7 +1120,9 @@ class ExportInventory:
         :rtype: str
         """
 
-        filename = filename or safe_filename(f"carculator_export_{datetime.date.today()}")
+        filename = filename or safe_filename(
+            f"carculator_export_{datetime.date.today()}"
+        )
         filename += "_bw2.xlsx"
 
         filepath_export = self.get_export_filepath(filename, directory)
