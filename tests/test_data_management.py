@@ -1,16 +1,11 @@
+import json
+import os
+from pathlib import Path
+
 import numpy as np
 import pytest
 
-from carculator_utils import (
-    isarray,
-    replace_values_in_array,
-    finite,
-    load_parameters,
-    data_to_dict,
-)
-import json
-from pathlib import Path
-import os
+from carculator_utils import data_to_dict, finite, isarray, load_parameters, replace_values_in_array
 
 
 class TestDataManagement:
@@ -27,9 +22,7 @@ class TestDataManagement:
         ],
     )
     def test_replace_values_in_array(self, x, cond):
-        np.testing.assert_array_equal(
-            replace_values_in_array(x, cond), np.array([1, 1, 1, 1, 1])
-        )
+        np.testing.assert_array_equal(replace_values_in_array(x, cond), np.array([1, 1, 1, 1, 1]))
 
     @pytest.mark.parametrize(
         "input_array, expected_result, mask_value",
@@ -51,9 +44,7 @@ class TestDataManagement:
     )
     def test_finite(self, input_array, expected_result, mask_value):
         if mask_value:
-            np.testing.assert_array_equal(
-                finite(input_array, mask_value), expected_result
-            )
+            np.testing.assert_array_equal(finite(input_array, mask_value), expected_result)
         else:
             np.testing.assert_array_equal(finite(input_array), expected_result)
 

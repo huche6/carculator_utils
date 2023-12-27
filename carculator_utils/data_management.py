@@ -1,7 +1,8 @@
+import json
+from pathlib import Path
+
 import numpy as np
 import xarray as xr
-from pathlib import Path
-import json
 
 
 def isarray(x):
