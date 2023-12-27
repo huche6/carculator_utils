@@ -1,5 +1,7 @@
 import numpy as np
 import xarray as xr
+from pathlib import Path
+import json
 
 
 def isarray(x):
@@ -73,3 +75,37 @@ def extract_values_from_datarray(x):
 
     """
     return x.values if isinstance(x, xr.DataArray) else x
+
+
+def finite(array, mask_value=0):
+    """Find finite values in array."""
+    return np.where(np.isfinite(array), array, mask_value)
+
+
+def load_parameters(obj):
+    """Load parameters."""
+    if isinstance(obj, (str, Path)):
+        assert Path(obj).exists(), f"Can't find this filepath {obj}."
+        return json.load(open(obj))
+    else:
+        # Already in correct form, just return
+        return obj
+
+
+def data_to_dict(csv_list: list) -> dict:
+    """Get a dictionnary from a sequence of items.
+
+    :param csv_list: list
+    :return: dict
+    """
+
+    if not csv_list:
+        return {}
+
+    (_, *header), *data = csv_list
+    csv_dict = {}
+    for row in data:
+        key, *values = row
+        csv_dict[key] = dict(zip(header, values))
+
+    return csv_dict

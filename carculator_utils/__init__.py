@@ -15,6 +15,9 @@ from .data_management import (  # isort:skip
     extract_values_from_datarray,
     isarray,
     replace_values_in_array,
+    load_parameters,
+    finite,
+    data_to_dict,
 )
 
 from .background_systems import BackgroundSystemModel
@@ -30,6 +33,9 @@ __all__ = (
     "isarray",
     "extract_values_from_datarray",
     "replace_values_in_array",
+    "load_parameters",
+    "finite",
+    "data_to_dict",
     "get_standard_driving_cycle_and_gradient",
     "NoiseEmissionsModel",
     "HotEmissionsModel",

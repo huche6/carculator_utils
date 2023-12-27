@@ -14,23 +14,7 @@ import xarray as xr
 import yaml
 
 from carculator_utils import data as data_carculator
-from carculator_utils import isarray
-
-
-def data_to_dict(csv_list: list) -> dict:
-    """Get a dictionnary from a sequence of items.
-
-    :param csv_list: list
-    :return: dict
-    """
-
-    (_, *header), *data = csv_list
-    csv_dict = {}
-    for row in data:
-        key, *values = row
-        csv_dict[key] = dict(zip(header, values))
-
-    return csv_dict
+from carculator_utils import isarray, data_to_dict
 
 
 def get_electricity_losses() -> Dict[str, float]:
@@ -85,7 +69,9 @@ def get_electricity_mix() -> xr.DataArray:
         .mean()
         .to_xarray()
     )
-    array = array.interpolate_na(dim="year", method="linear", fill_value="extrapolate").clip(0, 1)
+    array = array.interpolate_na(
+        dim="year", method="linear", fill_value="extrapolate"
+    ).clip(0, 1)
     array /= array.sum(axis=2)
 
     return array
@@ -155,7 +141,9 @@ def get_default_fuels() -> dict:
     filename = "default_fuels.yaml"
     filepath = Path(data_carculator.__file__).parent / "fuel" / filename
     if not filepath.is_file():
-        raise FileNotFoundError("The YAML file that contains default fuels could not be found.")
+        raise FileNotFoundError(
+            "The YAML file that contains default fuels could not be found."
+        )
     with open(filepath, "r") as file:
         default_fuels = yaml.safe_load(file)
 
@@ -262,7 +250,9 @@ class BackgroundSystemModel:
                 if self.default_fuels[fuel_type]["secondary"] != primary:
                     secondary = self.default_fuels[fuel_type]["secondary"]
                 else:
-                    secondary = [f for f in self.default_fuels[fuel_type]["all"] if f != primary][0]
+                    secondary = [
+                        f for f in self.default_fuels[fuel_type]["all"] if f != primary
+                    ][0]
 
             secondary_share = np.array(1) - np.zeros_like(np.array(years))
 
@@ -276,27 +266,41 @@ class BackgroundSystemModel:
             else:
                 if fuel_type == "diesel":
                     if country in self.biodiesel.country.values:
-                        secondary_share = self.get_share_biofuel("biodiesel", country, years)
+                        secondary_share = self.get_share_biofuel(
+                            "biodiesel", country, years
+                        )
                     else:
-                        secondary_share = self.get_share_biofuel("biodiesel", "RER", years)
+                        secondary_share = self.get_share_biofuel(
+                            "biodiesel", "RER", years
+                        )
 
                 elif fuel_type == "cng":
                     if country in self.biomethane.country.values:
-                        secondary_share = self.get_share_biofuel("biomethane", country, years)
+                        secondary_share = self.get_share_biofuel(
+                            "biomethane", country, years
+                        )
                     else:
-                        secondary_share = self.get_share_biofuel("biomethane", "RER", years)
+                        secondary_share = self.get_share_biofuel(
+                            "biomethane", "RER", years
+                        )
                 else:
                     if country in self.bioethanol.country.values:
-                        secondary_share = self.get_share_biofuel("bioethanol", country, years)
+                        secondary_share = self.get_share_biofuel(
+                            "bioethanol", country, years
+                        )
                     else:
-                        secondary_share = self.get_share_biofuel("bioethanol", "RER", years)
+                        secondary_share = self.get_share_biofuel(
+                            "bioethanol", "RER", years
+                        )
 
         primary_share = 1 - np.squeeze(np.array(secondary_share))
         secondary_share = np.squeeze(secondary_share)
 
         return primary, secondary, primary_share, secondary_share
 
-    def define_fuel_blends(self, powertrains: List[str], country: str, years: List[int]) -> dict:
+    def define_fuel_blends(
+        self, powertrains: List[str], country: str, years: List[int]
+    ) -> dict:
         """Define fuel blends.
 
         This function defines fuel blends from what is passed in `fuel_blend`.

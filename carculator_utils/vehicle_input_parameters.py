@@ -1,17 +1,6 @@
-import json
 from pathlib import Path
 
-from carculator_utils import NamedParameters
-
-
-def load_parameters(obj):
-    """Load parameters."""
-    if isinstance(obj, (str, Path)):
-        assert Path(obj).exists(), f"Can't find this filepath {obj}."
-        return json.load(open(obj))
-    else:
-        # Already in correct form, just return
-        return obj
+from carculator_utils import NamedParameters, load_parameters
 
 
 class VehicleInputParameters(NamedParameters):
@@ -71,11 +60,15 @@ class VehicleInputParameters(NamedParameters):
                     type(extra)
                 )
             )
-        self.sizes = sorted({size for o in parameters.values() for size in o.get("sizes", [])})
+        self.sizes = sorted(
+            {size for o in parameters.values() for size in o.get("sizes", [])}
+        )
         self.powertrains = sorted(
             {pt for o in parameters.values() for pt in o.get("powertrain", [])}
         )
-        self.parameters = sorted({o["name"] for o in parameters.values()}.union(set(extra)))
+        self.parameters = sorted(
+            {o["name"] for o in parameters.values()}.union(set(extra))
+        )
 
         # keep a list of input parameters, for sensitivity purpose
         self.input_parameters = sorted({o["name"] for o in parameters.values()})
@@ -99,6 +92,8 @@ class VehicleInputParameters(NamedParameters):
         reformatted = {}
         for key, dct in parameters.items():
             reformatted[key] = {k: v for k, v in dct.items() if k in KEYS}
-            reformatted[key]["metadata"] = {k: v for k, v in dct.items() if k not in KEYS}
+            reformatted[key]["metadata"] = {
+                k: v for k, v in dct.items() if k not in KEYS
+            }
 
         self.add_parameters(reformatted)
