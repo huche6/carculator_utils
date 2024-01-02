@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from carculator_utils import data_to_dict, finite, isarray, load_parameters, replace_values_in_array
+from carculator_utils import data_to_dict, isarray, load_parameters, replace_values_in_array
 
 
 class TestDataManagement:
@@ -23,30 +23,6 @@ class TestDataManagement:
     )
     def test_replace_values_in_array(self, x, cond):
         np.testing.assert_array_equal(replace_values_in_array(x, cond), np.array([1, 1, 1, 1, 1]))
-
-    @pytest.mark.parametrize(
-        "input_array, expected_result, mask_value",
-        [
-            (
-                np.array([1.0, 2.0, 3.0, np.inf, -np.inf, np.nan]),
-                np.array([1.0, 2.0, 3.0, 0.0, 0.0, 0.0]),
-                None,
-            ),
-            (
-                np.array([1.0, np.inf, -np.inf, np.nan]),
-                np.array([1.0, -1.0, -1.0, -1.0]),
-                -1.0,
-            ),
-            (np.array([]), np.array([]), None),
-            (np.array([1.0, 2.0, 3.0]), np.array([1.0, 2.0, 3.0]), None),
-            (np.array([np.inf, -np.inf, np.nan]), np.array([0.0, 0.0, 0.0]), None),
-        ],
-    )
-    def test_finite(self, input_array, expected_result, mask_value):
-        if mask_value:
-            np.testing.assert_array_equal(finite(input_array, mask_value), expected_result)
-        else:
-            np.testing.assert_array_equal(finite(input_array), expected_result)
 
     def test_load_parameters_with_valid_filepath(self):
         temp_file_path = "test_parameters.json"

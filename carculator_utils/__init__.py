@@ -16,7 +16,6 @@ from .data_management import (  # isort:skip
     isarray,
     replace_values_in_array,
     load_parameters,
-    finite,
     data_to_dict,
 )
 

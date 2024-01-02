@@ -6,7 +6,7 @@ import xarray as xr
 import yaml
 
 from carculator_utils import data as data_carculator
-from carculator_utils import finite, replace_values_in_array
+from carculator_utils import replace_values_in_array
 
 from .background_systems import BackgroundSystemModel
 from .driving_cycles import detect_vehicle_type
@@ -524,12 +524,14 @@ class VehicleModel:
         """
         # Here we assume that we can use fractions of a battery
         # (averaged across the fleet)
-        self["battery lifetime replacements"] = finite(
+        self["battery lifetime replacements"] = replace_values_in_array(
             np.clip(
                 (self["lifetime kilometers"] / self["battery lifetime kilometers"]) - 1,
                 0,
                 None,
-            )
+            ),
+            lambda x: np.isfinite(x),
+            mask_value=0,
         )
 
         # The number of fuel cell replacements is based on the
