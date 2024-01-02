@@ -35,7 +35,7 @@ def isarray(x):
     return np.asarray(x) if not isinstance(x, np.ndarray) else x
 
 
-def replace_values_in_array(x, functions):
+def replace_values_in_array(x, functions, mask_value=1):
     """Replace by 1 in the input array the values where the functions return True.
 
     Parameters
@@ -49,7 +49,7 @@ def replace_values_in_array(x, functions):
         An array where the input are replaced with 1 according to functions.
 
     """
-    return np.where(functions(x), 1, x)
+    return np.where(functions(x), mask_value, x)
 
 
 def extract_values_from_datarray(x):
@@ -76,11 +76,6 @@ def extract_values_from_datarray(x):
 
     """
     return x.values if isinstance(x, xr.DataArray) else x
-
-
-def finite(array, mask_value=0):
-    """Find finite values in array."""
-    return np.where(np.isfinite(array), array, mask_value)
 
 
 def load_parameters(obj):
