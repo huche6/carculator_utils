@@ -46,7 +46,7 @@ def replace_values_in_array(x, functions):
         An array where the input are replaced with 1 according to functions.
 
     """
-    return np.where(functions, 1, x)
+    return np.where(functions(x), 1, x)
 
 
 def extract_values_from_datarray(x):

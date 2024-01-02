@@ -143,8 +143,8 @@ class NoiseEmissionsModel:
 
         array = np.repeat(
             np.log10(
-                replace_values_in_array(_(self.velocity) / 70),
-                where=(_(self.velocity) > 0, lambda x: x < 1),
+                replace_values_in_array(_(self.velocity) / 70, lambda x: x < 1),
+                where=(_(self.velocity) > 0),
             ),
             8,
             axis=-1,
